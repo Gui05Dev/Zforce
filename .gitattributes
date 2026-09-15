@@ -1,0 +1,7 @@
+# Texto com fim de linha LF no repositório; binários nunca convertidos.
+* text=auto eol=lf
+*.glb binary
+*.bin binary
+*.png binary
+*.webp binary
+*.woff2 binary

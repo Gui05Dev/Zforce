@@ -1,0 +1,8 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+# Cópias de segurança locais (o histórico do Git já guarda as versões anteriores)
+backups/
+.DS_Store
+Thumbs.db

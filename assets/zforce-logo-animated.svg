@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="zforce-logo"
+     width="400" height="500" viewBox="0 0 400 500"
+     role="img" aria-labelledby="zf-title zf-description">
+  <title id="zf-title">Z FORCE - animated vector logo</title>
+  <desc id="zf-description">Electric scooter repair brand. A cyan-to-lime Z,
+    rotating wheel, counter-rotating gear, wrench, circuits and staggered speed
+    lines. The wordmark appears after the first 2.4-second cycle and stays visible.
+    Transparent background. Reduced-motion settings are respected.</desc>
+
+  <defs>
+    <linearGradient id="zf-brand" x1="106" y1="100" x2="284" y2="343"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00C2D1"/>
+      <stop offset="1" stop-color="#A8E000"/>
+    </linearGradient>
+    <linearGradient id="zf-small" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00C2D1"/>
+      <stop offset="1" stop-color="#A8E000"/>
+    </linearGradient>
+    <linearGradient id="zf-wheel-paint" x1="-30" y1="-32" x2="30" y2="32"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00C2D1"/>
+      <stop offset="1" stop-color="#A8E000"/>
+    </linearGradient>
+    <linearGradient id="zf-wordmark" x1="0" y1="24" x2="297" y2="24"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00C2D1"/>
+      <stop offset="1" stop-color="#A8E000"/>
+    </linearGradient>
+    <linearGradient id="zf-shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- One editable outline defines both the Z and its highlight clipping. -->
+    <path id="zf-z-outline" d="M100 96 H278 L315 133 L165 303 H285
+                              L316 344 H61 L214 165 H147 Z"/>
+    <clipPath id="zf-z-clip" clipPathUnits="userSpaceOnUse">
+      <use href="#zf-z-outline"/>
+    </clipPath>
+  </defs>
+
+  <style>
+    /* Scoped styles; no fonts, raster assets, JavaScript or external resources. */
+    #zforce-logo { --zf-cycle: 2.4s; display: block; max-width: 100%; height: auto; }
+    #zforce-logo .zf-edge {
+      stroke: #092630; stroke-width: 4;
+      stroke-linejoin: round; stroke-linecap: round;
+    }
+    #zforce-logo .zf-streak {
+      opacity: 0;
+      animation: zf-streak var(--zf-cycle) ease-in-out infinite;
+    }
+    #zforce-logo #speed-line-2 { animation-delay: .12s; }
+    #zforce-logo #speed-line-3 { animation-delay: .24s; }
+    #zforce-logo #speed-line-4 { animation-delay: .36s; }
+    /* Translation belongs to the parent; CSS rotates only the inner artwork. */
+    #zforce-logo #wheel, #zforce-logo #gear {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    #zforce-logo #wheel { animation: zf-wheel var(--zf-cycle) linear infinite; }
+    #zforce-logo #gear { animation: zf-gear 3s linear infinite; }
+    #zforce-logo #shine-sweep {
+      animation: zf-shine var(--zf-cycle) ease-in-out infinite;
+    }
+    #zforce-logo #wordmark {
+      opacity: 1;
+      animation: zf-reveal .45s ease-out var(--zf-cycle) 1 both;
+    }
+    @keyframes zf-wheel {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes zf-gear {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+    @keyframes zf-streak {
+      0%, 8% { opacity: 0; transform: translateX(-12px); }
+      23%, 39% { opacity: 1; transform: translateX(0); }
+      63%, 100% { opacity: 0; transform: translateX(10px); }
+    }
+    @keyframes zf-shine {
+      0%, 14% { opacity: 0; transform: translateX(-180px); }
+      24% { opacity: .7; }
+      57%, 100% { opacity: 0; transform: translateX(360px); }
+    }
+    @keyframes zf-reveal {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #zforce-logo #wheel, #zforce-logo #gear,
+      #zforce-logo .zf-streak, #zforce-logo #wordmark,
+      #zforce-logo #shine-sweep { animation: none; transform: none; }
+      #zforce-logo .zf-streak, #zforce-logo #wordmark { opacity: 1; }
+      #zforce-logo #shine-sweep { opacity: 0; }
+    }
+  </style>
+
+  <!-- Each speed line can be styled or animated independently. -->
+  <g id="speed-lines" fill="url(#zf-small)" class="zf-edge" stroke-width="2.5">
+    <g id="speed-line-1" class="zf-streak"><path d="M42 96 H83 L94 107 H53 Z"/></g>
+    <g id="speed-line-2" class="zf-streak"><path d="M52 117 H84 L95 128 H63 Z"/></g>
+    <g id="speed-line-3" class="zf-streak"><path d="M62 138 H86 L97 149 H73 Z"/></g>
+    <g id="speed-line-4" class="zf-streak"><path d="M72 159 H88 L99 170 H83 Z"/></g>
+  </g>
+
+  <g id="top-accents" fill="#A8E000" class="zf-edge" stroke-width="3">
+    <path d="M271 75 H294 L305 86 H282 Z"/>
+    <path d="M282 97 H337 L311 123 Z"/>
+    <path d="M313 146 H333 L317 165 H297 Z"/>
+  </g>
+
+  <!-- The smaller rear wheel is partially covered by the main letter. -->
+  <g id="rear-wheel" class="zf-edge" fill="none">
+    <circle cx="91" cy="313" r="27" stroke-width="10"/>
+    <path d="M70 330 A27 27 0 0 1 108 292" stroke="#00C2D1" stroke-width="6"/>
+    <path d="M62 291 A37 37 0 0 1 92 276" stroke="#A8E000" stroke-width="5"/>
+  </g>
+
+  <g id="wheel-fender" fill="none" stroke-linecap="round">
+    <path d="M269 280 Q301 254 337 276" stroke="#092630" stroke-width="11"/>
+    <path d="M269 280 Q301 254 337 276" stroke="#00C2D1" stroke-width="5"/>
+  </g>
+
+  <g id="wheel-position" transform="translate(303 315)">
+    <g id="wheel">
+      <circle id="wheel-tire" r="40" fill="#092630"/>
+      <circle id="wheel-rim" r="33" fill="none" stroke="url(#zf-wheel-paint)" stroke-width="7"/>
+      <circle id="wheel-inner-rim" r="22" fill="none" stroke="#00C2D1" stroke-opacity=".55" stroke-width="1.5"/>
+      <g id="wheel-spokes" fill="none" stroke="url(#zf-wheel-paint)" stroke-width="4"
+         stroke-linecap="round">
+        <path id="wheel-spoke-1" d="M0 -11 V-26" transform="rotate(0)"/>
+        <path id="wheel-spoke-2" d="M0 -11 V-26" transform="rotate(60)"/>
+        <path id="wheel-spoke-3" d="M0 -11 V-26" transform="rotate(120)"/>
+        <path id="wheel-spoke-4" d="M0 -11 V-26" transform="rotate(180)"/>
+        <path id="wheel-spoke-5" d="M0 -11 V-26" transform="rotate(240)"/>
+        <path id="wheel-spoke-6" d="M0 -11 V-26" transform="rotate(300)"/>
+      </g>
+      <circle id="wheel-hub" r="7" fill="#00C2D1"/>
+    </g>
+  </g>
+
+  <g id="circuit-lines" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <g id="circuit-underlay" stroke="#092630" stroke-width="7">
+      <path d="M302 177 L213 286 H248"/>
+      <path d="M290 204 L234 273 H257"/>
+    </g>
+    <g id="circuit-traces" stroke="#00C2D1" stroke-width="3">
+      <path d="M302 177 L213 286 H248"/>
+      <path d="M290 204 L234 273 H257"/>
+    </g>
+    <g id="circuit-terminals" fill="#00C2D1" stroke="#092630" stroke-width="2">
+      <circle cx="302" cy="177" r="4"/>
+      <circle cx="290" cy="204" r="4"/>
+      <circle cx="248" cy="286" r="4"/>
+      <circle cx="257" cy="273" r="4"/>
+    </g>
+  </g>
+
+  <g id="z-main">
+    <use href="#zf-z-outline" fill="url(#zf-brand)" stroke="#092630" stroke-width="5"/>
+    <g id="z-facets" clip-path="url(#zf-z-clip)">
+      <path d="M100 96 H278 L315 133 L304 133 L273 106 H109 Z"
+            fill="#FFFFFF" opacity=".17"/>
+      <path d="M214 165 H230 L80 334 H309 L316 344 H61 Z"
+            fill="#092630" opacity=".17"/>
+    </g>
+  </g>
+
+  <g id="scooter-deck">
+    <path d="M172 303 H303 A12 12 0 0 1 303 327 H151 Z"
+          fill="#00C2D1" class="zf-edge"/>
+    <path d="M178 307 H290" fill="none" stroke="#FFFFFF" stroke-opacity=".3"
+          stroke-width="2" stroke-linecap="round"/>
+    <circle cx="303" cy="315" r="4" fill="#092630"/>
+  </g>
+
+  <g id="gear-motion-traces" fill="none" stroke="#00C2D1" stroke-width="3.5"
+     stroke-linecap="round">
+    <path d="M94 199 H111"/>
+    <path d="M86 208 H107"/>
+    <path d="M97 217 H111"/>
+  </g>
+  <g id="gear-position" transform="translate(136 208)">
+    <g id="gear">
+      <path d="M15.71 -6.51 L16.63 -3.53 L21.73 -3.44 L21.73 3.44 L16.63 3.53 L15.71 6.51 L14.26 9.26 L17.80 12.93 L12.93 17.80 L9.26 14.26 L6.51 15.71 L3.53 16.63 L3.44 21.73 L-3.44 21.73 L-3.53 16.63 L-6.51 15.71 L-9.26 14.26 L-12.93 17.80 L-17.80 12.93 L-14.26 9.26 L-15.71 6.51 L-16.63 3.53 L-21.73 3.44 L-21.73 -3.44 L-16.63 -3.53 L-15.71 -6.51 L-14.26 -9.26 L-17.80 -12.93 L-12.93 -17.80 L-9.26 -14.26 L-6.51 -15.71 L-3.53 -16.63 L-3.44 -21.73 L3.44 -21.73 L3.53 -16.63 L6.51 -15.71 L9.26 -14.26 L12.93 -17.80 L17.80 -12.93 L14.26 -9.26 Z M8 0 A8 8 0 1 0 -8 0 A8 8 0 1 0 8 0 Z" fill="url(#zf-small)" fill-rule="evenodd"
+            stroke="#092630" stroke-width="2.5" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <g id="wrench" transform="translate(281 237) scale(.78)">
+    <path d="M6 -19 C-4 -18 -7 -9 -2 -2 L-19 15
+             A6.5 6.5 0 0 0 -10 24 L7 7
+             C15 11 24 3 21 -7 L14 0 L7 -2 L5 -9 L12 -16
+             C10 -18 8 -19 6 -19 Z"
+          fill="#A8E000" stroke="#092630" stroke-width="3"
+          stroke-linejoin="round"/>
+    <circle cx="-14.5" cy="19.5" r="2.4" fill="#092630"/>
+  </g>
+
+  <g id="z-highlight" clip-path="url(#zf-z-clip)" pointer-events="none">
+    <g id="shine-sweep">
+      <path d="M70 70 H145 L60 350 H-15 Z" fill="url(#zf-shine)"/>
+    </g>
+  </g>
+
+  <!-- Custom vector lettering: no font substitution and no external font file. -->
+  <g id="wordmark" aria-label="Z FORCE">
+    <g id="wordmark-layout" transform="translate(55 403) skewX(-10)"
+       fill="url(#zf-wordmark)" fill-rule="evenodd">
+      <path id="letter-z" d="M0 0 H43 V10 L16 36 H43 V48 H0 V37 L27 12 H0 Z"/>
+      <path id="letter-f" d="M58 0 H97 V12 H72 V20 H92 V32 H72 V48 H58 Z"/>
+      <path id="letter-o" d="M116 0 H136 Q148 0 148 12 V36 Q148 48 136 48
+          H116 Q104 48 104 36 V12 Q104 0 116 0 Z
+          M120 12 Q118 12 118 15 V33 Q118 36 120 36 H132
+          Q134 36 134 33 V15 Q134 12 132 12 Z"/>
+      <path id="letter-r" d="M155 0 H185 Q199 0 199 14 V18 Q199 27 189 30
+          L201 48 H184 L173 32 H169 V48 H155 Z
+          M169 12 V21 H182 Q185 21 185 17 Q185 12 182 12 Z"/>
+      <path id="letter-c" d="M220 0 H249 V12 H224 Q220 12 220 17 V31
+          Q220 36 224 36 H249 V48 H220 Q206 48 206 34 V14 Q206 0 220 0 Z"/>
+      <path id="letter-e" d="M256 0 H297 V12 H270 V19 H292 V30 H270 V36
+          H297 V48 H256 Z"/>
+    </g>
+  </g>
+</svg>

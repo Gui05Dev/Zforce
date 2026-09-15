@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Gerador da imagem de fallback do diagnóstico</title>
+  <style>
+    html, body { margin: 0; background: transparent; }
+    #palco { position: relative; width: 1200px; height: 900px; }
+    #canvas { position: absolute; inset: 0; }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }
+  </script>
+</head>
+<body>
+  <div id="palco"><div id="canvas"></div></div>
+  <script type="module">
+    // Usa o MESMO visualizador e a MESMA configuração do site: a imagem e as posições dos pontos
+    // correspondem exatamente à vista inicial do modelo 3D.
+    import { createScooterViewer } from '/js/modules/scooterViewer.js';
+    import { CAMERA, COMPONENTS } from '/js/data/diagnostic.js';
+
+    const stage = document.getElementById('palco');
+    const viewer = await createScooterViewer({
+      container: document.getElementById('canvas'),
+      stage,
+      components: COMPONENTS,
+      hotspotElements: new Map(),
+      camera: CAMERA,
+      urls: ['/public/assets/models/xiaomi-scooter/scene-otimizado.glb'],
+      reducedMotion: true,
+      touch: false,
+    });
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    window.__resultado = viewer.snapshot('image/webp', 0.88);
+  </script>
+</body>
+</html>
