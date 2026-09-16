@@ -1,5 +1,5 @@
 // Gera assets/models/patinete-zforce.glb (patinete técnico do hero) a partir do modelo original
-// em public/assets/models/xiaomi-scooter/ (Sketchfab, CC-BY-4.0), sem alterar o original.
+// em assets-src/models/xiaomi-scooter/ (Sketchfab, CC-BY-4.0), sem alterar o original.
 //
 //   npm run model:build
 //

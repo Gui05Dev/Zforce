@@ -18,8 +18,11 @@ import { whatsappUrl } from './contact.js';
 export const MODEL = {
   // Caminhos relativos à página (equivalem a /assets/models/xiaomi-scooter/… na raiz do site e
   // continuam válidos se o site for publicado numa subpasta).
+  //
+  // Só o GLB otimizado (~900 KB) é publicado. O original (scene.gltf + scene.bin + textures/, ~9,4 MB)
+  // fica em assets-src/, fora do build: como fallback ele não fazia sentido — se 900 KB não chegam,
+  // 9,4 MB muito menos. Quando este arquivo falha, a seção cai para a imagem ilustrativa (~43 KB).
   otimizado: 'assets/models/xiaomi-scooter/scene-otimizado.glb',
-  original: 'assets/models/xiaomi-scooter/scene.gltf',
   poster: { src: 'assets/diagnostico/patinete-diagnostico.webp', width: 1200, height: 900 },
   descricao:
     'Modelo 3D ilustrativo de um patinete elétrico, visto em três quartos. Cinco pontos marcam as regiões de ' +

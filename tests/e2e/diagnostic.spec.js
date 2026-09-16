@@ -2,7 +2,18 @@
 // então estes testes valem para os dois modos (3D ou imagem): interações, WhatsApp, acessibilidade e layout.
 // Modo imagem forçado: tests/e2e/no-webgl.spec.js. Detalhes do 3D (rotação, GPU): tests/gpu/diagnostic.spec.js.
 import { test, expect } from '@playwright/test';
+import { readdirSync, statSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { scrollToElement, watchConsole } from './helpers.js';
+
+/** Tamanho total de uma pasta, em MB. */
+function pastaMB(dir) {
+  const bytes = readdirSync(dir, { withFileTypes: true }).reduce((total, entry) => {
+    const caminho = join(dir, entry.name);
+    return total + (entry.isDirectory() ? pastaMB(caminho) * 1024 * 1024 : statSync(caminho).size);
+  }, 0);
+  return bytes / 1024 / 1024;
+}
 
 const stage = page => page.locator('[data-diagnostic-stage]');
 const card = (page, id) => page.locator(`[data-card-component="${id}"]`);
@@ -38,22 +49,31 @@ async function hotspotsInsideStage(page) {
   return out;
 }
 
-test('arquivos do modelo e da imagem respondem HTTP 200 (scene.gltf, scene.bin, texturas, GLB, fallback)', async ({ page, request }) => {
+test('publica o GLB otimizado, a licença e a imagem — e não o modelo original', async ({ page, request }) => {
   const base = 'assets/models/xiaomi-scooter/';
-  const gltf = await (await request.get(base + 'scene.gltf')).json();
-  const paths = [
-    'scene.gltf',
-    'scene-otimizado.glb',
-    'license.txt',
-    ...gltf.buffers.map(b => b.uri),
-    ...gltf.images.map(i => i.uri),
-  ].map(p => base + p);
   await page.goto('/');
-  paths.push(await page.locator('[data-diagnostic-poster]').getAttribute('src'));
+  const paths = [base + 'scene-otimizado.glb', base + 'license.txt', await page.locator('[data-diagnostic-poster]').getAttribute('src')];
   for (const path of paths) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(200);
   }
+
+  // O original (~9,4 MB) vive em assets-src/ e não pode voltar para o site publicado.
+  // O `vite preview` responde rota desconhecida com o index.html (200); o GitHub Pages responde 404.
+  // Nos dois casos o que importa é que o corpo não seja o modelo.
+  for (const path of ['scene.gltf', 'scene.bin', 'textures/Carro_Vermelho_baseColor.png']) {
+    const response = await request.get(base + path);
+    if (response.status() !== 200) continue;
+    expect((await response.text()).slice(0, 15).toLowerCase(), base + path).toContain('<!doctype');
+  }
+});
+
+test('o build publicado não carrega o modelo original (regressão dos 12 MB de dist/)', () => {
+  const models = resolve(process.cwd(), 'dist/assets/models/xiaomi-scooter');
+  expect(readdirSync(models).sort()).toEqual(['license.txt', 'scene-otimizado.glb']);
+
+  const tamanhoMB = pastaMB(resolve(process.cwd(), 'dist'));
+  expect(tamanhoMB, `dist/ com ${tamanhoMB.toFixed(1)} MB`).toBeLessThan(5);
 });
 
 test('carregamento direto em /#como-funciona e atualização da página', async ({ page }) => {

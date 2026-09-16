@@ -23,11 +23,13 @@ export function initScrollAnimations({ env, hooks = {} }) {
     onSectionChange = noop,
     onHeroVisible = noop,
     onContactVisible = noop,
-    onResultsVisible = noop,
     onDiagnosticVisible = noop,
   } = hooks;
   const animate = !env.reducedMotion;
   const mobile = env.mobile;
+  // A trava do index.html remove .anim quando este bundle demora mais de 1,2 s: o hero já foi
+  // revelado por CSS. Refazer a entrada aqui esconderia tudo de novo — um piscar bem visível.
+  const heroPendente = document.documentElement.classList.contains('anim');
 
   // Gatilhos estruturais: valem com ou sem movimento, porque alimentam estados da interface.
   const structure = gsap.context(() => {
@@ -53,17 +55,6 @@ export function initScrollAnimations({ env, hooks = {} }) {
         start: 'top bottom',
         end: 'bottom 35%',
         onToggle: self => onHeroVisible(self.isActive),
-      });
-    }
-
-    // Na seção de resultados o WhatsApp flutuante cobriria o comparador e os botões de toque.
-    const resultsGrid = $('.resultados-grade');
-    if (resultsGrid) {
-      ScrollTrigger.create({
-        trigger: resultsGrid,
-        start: 'top bottom',
-        end: 'bottom top',
-        onToggle: self => onResultsVisible(self.isActive),
       });
     }
 
@@ -103,7 +94,8 @@ export function initScrollAnimations({ env, hooks = {} }) {
 
   if (animate) {
     try {
-      intro = gsap.context(() => heroIntro({ onHeroDrawing, mobile }));
+      if (heroPendente) intro = gsap.context(() => heroIntro({ onHeroDrawing, mobile }));
+      else onHeroDrawing(); // hero já visível: só o desenho técnico ainda precisa ser disparado
 
       // Revelações e feixes: revertem sozinhos se o usuário ativar "reduzir movimento" com a página aberta.
       mm.add('(prefers-reduced-motion: no-preference)', () => scrollReveals({ mobile, lowPower: env.lowPower }));
@@ -209,9 +201,8 @@ function scrollReveals({ mobile, lowPower }) {
   // Cards de serviço: o GSAP move o <li>; o card interno é do Motion.
   batchReveal('.servico', { y: mobile ? 28 : 56, scale: mobile ? 1 : 0.98, stagger: 0.1, start: 'top 94%', duration: 0.95 });
 
-  // Blocos revelados como um todo: comparador e miniaturas (Resultados), palco 3D, painel do
-  // diagnóstico e etapas. O conteúdo interno pertence a outras camadas (slider, PhotoSwipe,
-  // Three.js nos hotspots, Motion no card).
+  // Blocos revelados como um todo: palco 3D, painel do diagnóstico e etapas. O conteúdo
+  // interno pertence a outras camadas (Three.js nos hotspots, Motion no card).
   batchReveal('[data-reveal-block]', { y: mobile ? 24 : 44, stagger: 0.08, start: 'top 94%', duration: 0.95 });
 
   const statsList = $('[data-stats]');

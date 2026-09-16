@@ -5,8 +5,9 @@ import { Matrix4, Vector3 } from 'three';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Modelo original (Sketchfab, CC-BY-4.0). Nunca é alterado: os scripts só leem daqui.
-export const SOURCE = resolve(ROOT, 'public/assets/models/xiaomi-scooter/scene.gltf');
+// Modelo original (Sketchfab, CC-BY-4.0). Fica em assets-src/ — fora de public/, portanto
+// versionado no Git mas nunca copiado para o dist/. Nunca é alterado: os scripts só leem daqui.
+export const SOURCE = resolve(ROOT, 'assets-src/models/xiaomi-scooter/scene.gltf');
 
 // Símbolo do fabricante na placa da frente do deck (coordenadas de mundo, metros; frente em +Z).
 // Localizado por mapa de vértices: glifo de ~3,5 cm em x −0,07…−0,035, z 0,09…0,12, y 0,1445…0,1469,

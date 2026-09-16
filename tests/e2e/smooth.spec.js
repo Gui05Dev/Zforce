@@ -37,7 +37,7 @@ test.describe('desktop com ScrollSmoother', () => {
     await page.goto('/');
     await page.waitForTimeout(800);
     const header = await headerHeight(page);
-    for (const id of ['servicos', 'resultados', 'como-funciona', 'sobre', 'contato']) {
+    for (const id of ['servicos', 'como-funciona', 'sobre', 'contato']) {
       await page.locator(`#menu a[href="#${id}"]`).click();
       await page.waitForTimeout(SETTLE + 300);
       const top = await topOf(page, `#${id}`);
@@ -74,7 +74,7 @@ for (const viewport of [
   { width: 1440, height: 900 },
   { width: 390, height: 844 },
 ]) {
-  test(`WhatsApp flutuante ${viewport.width}px: fora do hero, de Resultados, do diagnóstico e do CTA/rodapé`, async ({ page }) => {
+  test(`WhatsApp flutuante ${viewport.width}px: fora do hero, do diagnóstico e do CTA/rodapé`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/');
     await page.waitForTimeout(1500);
@@ -82,9 +82,6 @@ for (const viewport of [
 
     await scrollToElement(page, '.servicos', 0.1);
     expect(await floatingState(page)).toEqual({ visible: true, focusable: true });
-
-    await scrollToElement(page, '.resultados-grade', 0.1);
-    expect(await floatingState(page)).toEqual({ visible: false, focusable: false });
 
     await scrollToElement(page, '.diagnostico', 0.1);
     expect(await floatingState(page)).toEqual({ visible: false, focusable: false });
@@ -113,10 +110,10 @@ test.describe('aparelho só de toque', () => {
     await page.waitForTimeout(800);
     await expect(page.locator('html')).not.toHaveClass(/has-smoother/);
     await page.locator('[data-menu-toggle]').tap();
-    await page.locator('#menu a[href="#resultados"]').tap();
+    await page.locator('#menu a[href="#como-funciona"]').tap();
     await page.waitForTimeout(1500);
     const header = await headerHeight(page);
-    expect(Math.abs((await topOf(page, '#resultados')) - header)).toBeLessThanOrEqual(4);
+    expect(Math.abs((await topOf(page, '#como-funciona')) - header)).toBeLessThanOrEqual(4);
     expect(problems).toEqual([]);
   });
 });

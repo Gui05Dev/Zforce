@@ -3,8 +3,9 @@
 //   npm run model:build
 //
 // Diferente do patinete técnico do hero, aqui os materiais e as texturas originais são preservados
-// (a seção mostra o modelo com iluminação). O original (scene.gltf + scene.bin + textures/) não é
-// alterado e continua sendo o fallback do visualizador se o GLB otimizado falhar.
+// (a seção mostra o modelo com iluminação). O original (scene.gltf + scene.bin + textures/, ~9,4 MB)
+// fica em assets-src/ e não é publicado: se este GLB falhar, o visualizador cai para a imagem
+// ilustrativa, que é muito mais leve do que baixar o modelo original.
 //
 // O que faz: remove o símbolo do fabricante do deck, junta imagens/materiais idênticos, junta as
 // malhas por material (menos draw calls), simplifica a geometria preservando a silhueta, quantiza

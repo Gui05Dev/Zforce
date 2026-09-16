@@ -13,14 +13,13 @@
     "test:e2e": "playwright test --project=chrome",
     "model:build": "node --no-deprecation scripts/optimize-scooter.mjs && node --no-deprecation scripts/optimize-diagnostic-model.mjs",
     "test:gpu": "playwright test --project=gpu",
-    "diagnostic:poster": "node scripts/diagnostic-poster.mjs"
+    "diagnostic:poster": "node scripts/diagnostic-poster.mjs",
+    "og:image": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "animejs": "4.5.0",
     "gsap": "3.15.0",
-    "img-comparison-slider": "8.0.7",
     "motion": "13.3.0",
-    "photoswipe": "5.4.4",
     "three": "0.186.0"
   },
   "devDependencies": {

@@ -36,9 +36,9 @@ for (const viewport of VIEWPORTS) {
 test('ordem e numeração das seções', async ({ page }) => {
   await page.goto('/');
   const ids = await page.$$eval('main > section[id]', els => els.map(el => el.id));
-  expect(ids).toEqual(['inicio', 'servicos', 'resultados', 'como-funciona', 'sobre', 'contato']);
-  await expect(page.locator('main .rotulo > span')).toHaveText(['01', '02', '03', '04', '05']);
-  await expect(page.locator('#menu a')).toHaveText(['Serviços', 'Resultados', 'Diagnóstico', 'Sobre', 'Contato']);
+  expect(ids).toEqual(['inicio', 'servicos', 'como-funciona', 'sobre', 'contato']);
+  await expect(page.locator('main .rotulo > span')).toHaveText(['01', '02', '03', '04']);
+  await expect(page.locator('#menu a')).toHaveText(['Serviços', 'Diagnóstico', 'Sobre', 'Contato']);
 });
 
 test('links de contato preservados', async ({ page }) => {
@@ -121,7 +121,6 @@ test('contraste dos textos secundários', async ({ page }) => {
     '.abertura-lead',
     '.servico-resumo',
     '.problemas span',
-    '.comparador-texto',
     '.diagnostico-card-resumo',
     '.diagnostico-sintoma',
     '.diagnostico-aviso',
@@ -188,8 +187,5 @@ test.describe('JavaScript desativado', () => {
     await expect(page.locator('#menu a').first()).toBeVisible();
     await expect(page.locator('.problemas a').first()).toBeVisible();
     await expect(page.locator('[data-count]').last()).toHaveText('100');
-    // Comparador sem JS: a imagem "antes" aparece no espaço reservado; miniaturas são links.
-    await expect(page.locator('[data-comparison-slider] [slot="first"] img')).toBeVisible();
-    await expect(page.locator('.galeria-link').first()).toHaveAttribute('href', /assets\/resultados\/.+\.webp$/);
   });
 });

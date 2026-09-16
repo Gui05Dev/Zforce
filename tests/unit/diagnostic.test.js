@@ -5,6 +5,8 @@ import { WHATSAPP_NUMBER, whatsappUrl } from '../../js/data/contact.js';
 import { CAMERA, COMPONENTS, MODEL, STEPS, diagnosticMessage, diagnosticUrl, renderDiagnostic } from '../../js/data/diagnostic.js';
 
 const publicFile = path => new URL(`../../public/${path}`, import.meta.url);
+// Modelo original: versionado, mas fora de public/ — não é copiado para o dist/.
+const sourceFile = path => new URL(`../../assets-src/models/xiaomi-scooter/${path}`, import.meta.url);
 
 test('cinco componentes pedidos, cada um com quatro sintomas', () => {
   assert.deepEqual(
@@ -69,13 +71,21 @@ test('HTML gerado: botões acessíveis, cards, sintomas, CTA, aviso e quatro eta
   assert.deepEqual(STEPS.map(s => s.rotulo), ['Conversa', 'Avaliação', 'Orçamento', 'Entrega']);
 });
 
-test('modelo original no caminho público, com scene.bin, texturas e licença', () => {
-  const base = 'assets/models/xiaomi-scooter';
-  const gltf = JSON.parse(readFileSync(publicFile(`${base}/scene.gltf`), 'utf8'));
-  for (const buffer of gltf.buffers) assert.ok(existsSync(publicFile(`${base}/${buffer.uri}`)), buffer.uri);
-  for (const image of gltf.images) assert.ok(existsSync(publicFile(`${base}/${decodeURI(image.uri)}`)), image.uri);
-  assert.match(readFileSync(publicFile(`${base}/license.txt`), 'utf8'), /CC-BY-4\.0/);
-  assert.equal(MODEL.original, `${base}/scene.gltf`);
-  assert.ok(existsSync(publicFile(MODEL.otimizado)));
+test('modelo original completo em assets-src/ (fonte dos scripts de otimização)', () => {
+  const gltf = JSON.parse(readFileSync(sourceFile('scene.gltf'), 'utf8'));
+  for (const buffer of gltf.buffers) assert.ok(existsSync(sourceFile(buffer.uri)), buffer.uri);
+  for (const image of gltf.images) assert.ok(existsSync(sourceFile(decodeURI(image.uri))), image.uri);
+  assert.match(readFileSync(sourceFile('license.txt'), 'utf8'), /CC-BY-4\.0/);
+});
+
+test('só o GLB otimizado e a licença são publicados (o original de ~9,4 MB fica fora do build)', () => {
+  assert.ok(existsSync(publicFile(MODEL.otimizado)), 'GLB otimizado publicado');
+  assert.match(readFileSync(publicFile('assets/models/xiaomi-scooter/license.txt'), 'utf8'), /CC-BY-4\.0/);
   assert.ok(existsSync(new URL(`../../${MODEL.poster.src}`, import.meta.url)), 'imagem de fallback');
+
+  // Regressão: o scene.gltf/scene.bin/textures não podem voltar para public/, senão o dist volta a 12 MB.
+  assert.equal(MODEL.original, undefined, 'MODEL.original foi removido de propósito');
+  for (const file of ['scene.gltf', 'scene.bin', 'textures']) {
+    assert.ok(!existsSync(publicFile(`assets/models/xiaomi-scooter/${file}`)), `${file} não deve estar em public/`);
+  }
 });

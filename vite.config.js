@@ -6,7 +6,7 @@ import { defineConfig } from 'vite';
 // o marcador no index.html é trocado pelo HTML antes do processamento do Vite, então funciona no dev,
 // no build e sem JavaScript no navegador.
 const SECTIONS = [
-  { marker: '<!-- @results -->', module: '/js/data/results.js', render: 'renderResults' },
+  { marker: '<!-- @meta -->', module: '/js/data/site.js', render: 'renderMeta' },
   { marker: '<!-- @diagnostic -->', module: '/js/data/diagnostic.js', render: 'renderDiagnostic' },
 ];
 // Editar estes arquivos recarrega a página (o HTML precisa ser gerado de novo).
@@ -44,10 +44,45 @@ function generatedSections() {
   };
 }
 
+/**
+ * robots.txt e sitemap.xml gerados de js/data/site.js: o endereço do site fica em um arquivo só,
+ * então trocar de domínio não deixa um sitemap apontando para o lugar errado.
+ */
+function seoFiles() {
+  return {
+    name: 'zforce-seo-files',
+    apply: 'build',
+    async generateBundle() {
+      const { SITE } = await import(pathToFileURL(resolve(process.cwd(), 'js/data/site.js')).href);
+      const lastmod = new Date().toISOString().slice(0, 10);
+      this.emitFile({
+        type: 'asset',
+        fileName: 'robots.txt',
+        source: `User-agent: *
+Allow: /
+
+Sitemap: ${new URL('sitemap.xml', SITE.url).href}
+`,
+      });
+      this.emitFile({
+        type: 'asset',
+        fileName: 'sitemap.xml',
+        source: [
+          '<?xml version="1.0" encoding="UTF-8"?>',
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+          `  <url><loc>${SITE.url}</loc><lastmod>${lastmod}</lastmod></url>`,
+          '</urlset>',
+          '',
+        ].join('\n'),
+      });
+    },
+  };
+}
+
 export default defineConfig({
   // Caminhos relativos: o dist/ funciona em subpastas (GitHub Pages) e na raiz (Netlify/Vercel).
   base: './',
-  plugins: [generatedSections()],
+  plugins: [generatedSections(), seoFiles()],
   build: {
     target: 'es2020',
     outDir: 'dist',

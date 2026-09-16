@@ -3,20 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Z-Force | Conserto de patinete e bike elétrica em Cafelândia-PR</title>
-  <meta name="description" content="Conserto de patinetes, scooters e bicicletas elétricas em Cafelândia-PR. Orçamento pelo WhatsApp antes do serviço, retirada e entrega a combinar.">
+  <!-- Título, descrição, canônica, Open Graph e JSON-LD: gerados de js/data/site.js no build -->
+  <!-- @meta -->
+
   <meta name="theme-color" content="#0a0a0b">
   <meta name="color-scheme" content="dark">
-  <meta property="og:title" content="Z-Force Mobilidade Elétrica">
-  <meta property="og:description" content="Conserto de patinete, scooter e bike elétrica em Cafelândia-PR. Fale com a Z-Force pelo WhatsApp.">
-  <meta property="og:type" content="website">
   <link rel="icon" href="assets/zforce-mark.webp">
+  <!-- As três fontes aparecem acima da dobra: a 400 no texto, a 600 no rótulo e no botão
+       do WhatsApp, e a Condensed 700 no <h1>. Sem o preload da 600 o botão principal
+       pisca com a fonte de sistema. -->
   <link rel="preload" href="assets/fonts/barlow-condensed-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Marca o documento antes da pintura: sem JS o conteúdo fica visível; com JS e sem
        "reduzir movimento", o hero começa oculto até a timeline do GSAP assumir.
-       Se o JS falhar, a trava de 4 s devolve tudo ao estado visível. -->
+
+       A trava existe porque o hero (h1, texto e botão do WhatsApp) é o conteúdo que mais
+       importa e ele fica em opacity: 0 esperando o bundle de animação. Se em 1,2 s o GSAP
+       não avisou que assumiu ("anim-ready"), o CSS revela o hero sozinho com um fade curto
+       (.anim-fallback) e o GSAP, ao chegar, pula a entrada em vez de escondê-la de novo. -->
   <script>
     (function (d) {
       var c = d.documentElement.classList;
@@ -24,25 +30,16 @@
       c.add('js');
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         c.add('anim');
-        setTimeout(function () { if (!c.contains('anim-ready')) c.remove('anim'); }, 4000);
+        setTimeout(function () {
+          if (c.contains('anim-ready')) return;
+          c.add('anim-fallback');
+          c.remove('anim');
+        }, 1200);
       }
     })(document);
   </script>
 
   <link rel="stylesheet" href="css/style.css">
-
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"LocalBusiness",
-    "name":"Z-Force Mobilidade Elétrica",
-    "description":"Conserto de patinetes, scooters e bicicletas elétricas.",
-    "telephone":"+55 45 98803-7791",
-    "address":{"@type":"PostalAddress","addressLocality":"Cafelândia","addressRegion":"PR","addressCountry":"BR"},
-    "areaServed":"Cafelândia-PR",
-    "sameAs":["https://www.instagram.com/zforce_scooter/"]
-  }
-  </script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -61,7 +58,6 @@
 
       <nav id="menu" class="menu" aria-label="Navegação principal" data-menu>
         <a href="#servicos">Serviços</a>
-        <a href="#resultados">Resultados</a>
         <a href="#como-funciona">Diagnóstico</a>
         <a href="#sobre">Sobre</a>
         <a href="#contato">Contato</a>
@@ -76,8 +72,8 @@
     <span class="topo-progresso" aria-hidden="true" data-progress></span>
   </header>
 
-  <!-- ScrollSmoother: só o conteúdo rolável fica aqui dentro. Topo fixo, WhatsApp flutuante
-       e o modal do PhotoSwipe (inserido no <body>) ficam fora, sem sofrer transform. -->
+  <!-- ScrollSmoother: só o conteúdo rolável fica aqui dentro. Topo fixo e WhatsApp flutuante
+       ficam fora, sem sofrer transform. -->
   <div id="smooth-wrapper">
   <div id="smooth-content">
   <main id="conteudo" tabindex="-1">
@@ -270,22 +266,10 @@
       </div>
     </section>
 
-    <section class="secao secao--resultados" id="resultados" data-results>
-      <div class="shell">
-        <div class="secao-cabeca">
-          <p class="rotulo" data-reveal="fade"><span>02</span> Resultados reais</p>
-          <h2 data-reveal="heading">Resultados que você pode ver.</h2>
-          <p class="secao-apoio" data-reveal="fade">Arraste para comparar e toque nas imagens para ver os detalhes.</p>
-        </div>
-        <!-- Gerado a partir de js/data/results.js pelo plugin em vite.config.js -->
-        <!-- @results -->
-      </div>
-    </section>
-
     <section class="secao secao--diagnostico" id="como-funciona" data-diagnostic>
       <div class="shell">
         <div class="secao-cabeca">
-          <p class="rotulo" data-reveal="fade"><span>03</span> Diagnóstico interativo</p>
+          <p class="rotulo" data-reveal="fade"><span>02</span> Diagnóstico interativo</p>
           <h2 data-reveal="heading">Explore o patinete e descubra onde pode estar o problema.</h2>
           <p class="secao-apoio" data-reveal="fade">Gire o modelo, selecione um componente e conheça alguns dos sintomas mais comuns.</p>
         </div>
@@ -298,7 +282,7 @@
       <div class="shell">
         <div class="duas-colunas">
           <div>
-            <p class="rotulo" data-reveal="fade"><span>04</span> Sobre</p>
+            <p class="rotulo" data-reveal="fade"><span>03</span> Sobre</p>
             <h2 data-reveal="heading">Sobre a Z-Force</h2>
           </div>
           <div class="sobre-texto" data-reveal="fade">
@@ -345,7 +329,7 @@
           </div>
 
           <div class="cta-conteudo">
-            <p class="rotulo" data-cta-item><span>05</span> Contato</p>
+            <p class="rotulo" data-cta-item><span>04</span> Contato</p>
             <h2 data-cta-title>Fale com a gente</h2>
             <p class="cta-texto" data-cta-item>Mande uma foto ou um vídeo do problema pelo WhatsApp. A gente avalia e passa o orçamento antes de mexer no veículo.</p>
             <div class="cta-acoes" data-cta-item>
@@ -371,7 +355,9 @@
     <div class="shell rodape-linha">
       <span>© <span data-year>2026</span> Z-Force Mobilidade Elétrica</span>
       <a href="#inicio">Voltar ao início ↑</a>
-      <!-- Crédito exigido pela licença CC BY 4.0 do modelo 3D (assets-src/models/xiaomi-mi-scooter/license.txt) -->
+      <!-- Crédito exigido pela licença CC BY 4.0 do modelo 3D.
+           Texto da licença: public/assets/models/xiaomi-scooter/license.txt (publicado junto com o site);
+           arquivos originais do modelo: assets-src/models/xiaomi-scooter/. -->
       <small class="rodape-creditos">Modelo 3D <a href="https://sketchfab.com/3d-models/2022-xiaomi-mi-scooter-582845e3d7b24d7a971fbb2bcd0cac0b" target="_blank" rel="noopener noreferrer">“2022 Xiaomi Mi Scooter”</a>, por <a href="https://sketchfab.com/tonielpro520" target="_blank" rel="noopener noreferrer">tonielpro520</a>, disponível no Sketchfab, licenciado sob <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Adaptado para este site (malha otimizada e marca removida; no topo, cores alteradas). Uso meramente ilustrativo, sem vínculo com a Xiaomi.</small>
     </div>
   </footer>

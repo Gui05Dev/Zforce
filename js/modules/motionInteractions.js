@@ -139,11 +139,25 @@ function mobileMenu(reduced, track) {
   const mobile = window.matchMedia('(max-width: 859px)');
   let open = false;
 
-  const clearInline = () => {
+  // Volta ao estado de CSS puro. O Motion grava valores no estilo inline enquanto anima, então
+  // cancelar a animação e limpar o estilo precisa acontecer junto — senão o menu fica preso à
+  // aparência de celular depois de voltar para o desktop (acontece ao girar o aparelho).
+  const limparEstilos = () => {
     [menu, ...links, ...lines].forEach(el => {
+      el.getAnimations().forEach(animation => animation.cancel());
       el.style.opacity = '';
       el.style.transform = '';
     });
+  };
+
+  let limpezaFrame = 0;
+  const clearInline = () => {
+    cancelAnimationFrame(limpezaFrame);
+    limparEstilos();
+    // O Motion só cria a animação da Web Animations API no quadro seguinte ao animate(): repetir
+    // a limpeza no próximo quadro alcança o que ainda não existia agora. (`cancel()` devolve o
+    // valor inicial e `stop()` congela no meio — os dois deixariam estilo inline para trás.)
+    limpezaFrame = requestAnimationFrame(limparEstilos);
     menu.classList.remove('open');
   };
 
@@ -173,9 +187,28 @@ function mobileMenu(reduced, track) {
   const onToggle = () => setOpen(!open);
   const onLink = () => setOpen(false);
   const onKey = event => {
-    if (event.key === 'Escape' && open) {
+    if (!open) return;
+    if (event.key === 'Escape') {
       setOpen(false);
       toggle.focus();
+      return;
+    }
+    // Foco preso no painel aberto: sem isto o Tab sai do menu e passeia pelo conteúdo que está
+    // atrás dele — que continua visível, mas inalcançável pelo mouse.
+    if (event.key !== 'Tab' || !mobile.matches) return;
+    const focusaveis = [toggle, ...links];
+    const primeiro = focusaveis[0];
+    const ultimo = focusaveis.at(-1);
+    const atual = document.activeElement;
+    if (!focusaveis.includes(atual)) {
+      event.preventDefault();
+      primeiro.focus();
+    } else if (event.shiftKey && atual === primeiro) {
+      event.preventDefault();
+      ultimo.focus();
+    } else if (!event.shiftKey && atual === ultimo) {
+      event.preventDefault();
+      primeiro.focus();
     }
   };
   const onOutside = event => {
@@ -201,6 +234,7 @@ function mobileMenu(reduced, track) {
     document.removeEventListener('click', onOutside);
     mobile.removeEventListener('change', onBreakpoint);
     clearInline();
+    cancelAnimationFrame(limpezaFrame);
   });
 
   return { close: () => setOpen(false) };
@@ -224,7 +258,9 @@ function navIndicator(reduced, track) {
       visible = false;
       return;
     }
-    const target = { x: link.offsetLeft, scaleX: link.offsetWidth / 100 };
+    // Largura de layout do indicador (offsetWidth ignora transform, então não acumula entre trocas).
+    const base = indicator.offsetWidth || 1;
+    const target = { x: link.offsetLeft, scaleX: link.offsetWidth / base };
     if (instant || reduced || !visible) {
       animate(indicator, target, { duration: 0 });
       animate(indicator, { opacity: 1 }, { duration: reduced ? 0 : 0.3 });

@@ -2,12 +2,18 @@
 
 /**
  * Decide quanto do fundo 3D o aparelho aguenta.
- * @param {{ mobile: boolean, lowPower: boolean, reducedMotion: boolean, webgl: boolean }} caps
+ *
+ * O corte é pelo APARELHO (`touchOnly`: tem toque e nenhum mouse), não pela largura da janela.
+ * Um desktop com a janela estreita tem a mesma GPU e menos pixels para desenhar, então recebe a
+ * cena completa — inclusive o patinete 3D que entra no lugar do desenho técnico. Como `touchOnly`
+ * não muda ao redimensionar, o resultado também não depende do tamanho da janela no carregamento
+ * (o ambiente é lido uma única vez, no boot).
+ * @param {{ touchOnly: boolean, lowPower: boolean, reducedMotion: boolean, webgl: boolean }} caps
  */
-export function getSceneConfig({ mobile, lowPower, reducedMotion, webgl }) {
+export function getSceneConfig({ touchOnly, lowPower, reducedMotion, webgl }) {
   if (reducedMotion || lowPower || !webgl) return null;
-  // scooter: modelo 3D no lugar do desenho técnico. Só no desktop; no celular fica o SVG.
-  return mobile
+  // scooter: modelo 3D no lugar do desenho técnico. No celular e no tablet fica o SVG.
+  return touchOnly
     ? { particles: 520, nodes: 34, streams: 2, maxDpr: 1.25, fps: 30, pointer: false, scooter: false }
     : { particles: 1500, nodes: 72, streams: 3, maxDpr: 1.5, fps: 60, pointer: true, scooter: true };
 }

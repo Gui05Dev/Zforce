@@ -28,7 +28,9 @@ function safely(name, factory, fallback) {
   }
 }
 
-function waitForFonts(timeout = 700) {
+// O SplitText mede linhas, então espera as fontes — mas com teto curto: elas já estão em
+// <link rel="preload">, e cada milissegundo aqui atrasa a revelação do hero (ver a trava no index.html).
+function waitForFonts(timeout = 400) {
   const ready = document.fonts ? document.fonts.ready : Promise.resolve();
   return Promise.race([ready, new Promise(resolve => setTimeout(resolve, timeout))]);
 }
@@ -54,7 +56,7 @@ function whenNear(element, margin, callback) {
 
 function loadHeroScene(drawing) {
   const host = $('[data-hero-canvas]');
-  const config = host && getSceneConfig({ ...env, webgl: env.webgl });
+  const config = host && getSceneConfig(env);
   if (!config) {
     root.classList.add('sem-3d');
     return;
@@ -91,65 +93,10 @@ function loadHeroScene(drawing) {
   );
 }
 
-function initResults(smooth) {
-  const section = $('[data-results]');
-  if (!section) return;
-
-  // Comparador: o componente é registrado quando a seção se aproxima.
-  whenNear(section, '600px', () => {
-    import('./modules/comparisonSlider.js')
-      .then(({ initComparisonSliders }) => {
-        if (disposed) return;
-        const sliders = initComparisonSliders(section);
-        cleanups.push(() => sliders.destroy());
-      })
-      .catch(error => console.warn('[z-force] comparador indisponível', error));
-  });
-
-  // Galeria: módulo e CSS do PhotoSwipe só no primeiro uso. Até lá, as miniaturas são links
-  // comuns para a imagem grande (funcionam sem JavaScript).
-  let galleryPromise = null;
-  const loadGallery = () => {
-    galleryPromise ??= import('./modules/gallery.js').then(({ createGallery }) => {
-      const gallery = createGallery({ onOpen: smooth.pause, onClose: smooth.resume });
-      cleanups.push(() => gallery.destroy());
-      return gallery;
-    });
-    return galleryPromise;
-  };
-
-  const onClick = event => {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    const thumb = event.target.closest('[data-gallery-index]');
-    const pairButton = event.target.closest('[data-open-pair]');
-    if (!thumb && !pairButton) return;
-    event.preventDefault();
-    loadGallery()
-      .then(gallery => {
-        if (thumb) gallery.openGallery(Number(thumb.dataset.galleryIndex));
-        else gallery.openPair(Number(pairButton.dataset.openPair));
-      })
-      .catch(error => {
-        console.warn('[z-force] galeria indisponível', error);
-        if (thumb) window.location.assign(thumb.href);
-      });
-  };
-  section.addEventListener('click', onClick);
-  cleanups.push(() => section.removeEventListener('click', onClick));
-
-  // Pré-carrega o módulo leve do lightbox quando o usuário chega perto (o núcleo continua sob demanda).
-  whenNear(section, '200px', () => idle(() => !disposed && loadGallery()));
-}
-
 async function boot() {
   performance.mark('zf:boot');
   // 1) ScrollSmoother antes de qualquer ScrollTrigger.
-  const smooth = safely('ScrollSmoother', () => initSmoothScroll({ env }), {
-    smoother: null,
-    pause() {},
-    resume() {},
-    destroy() {},
-  });
+  const smooth = safely('ScrollSmoother', () => initSmoothScroll({ env }), { smoother: null, destroy() {} });
   cleanups.push(() => smooth.destroy());
   performance.mark('zf:smoother');
 
@@ -171,7 +118,7 @@ async function boot() {
 
   // WhatsApp flutuante: escondido sobre o hero, sobre os controles de "Resultados" e do diagnóstico,
   // e do CTA final até o rodapé. Começa "fora" de todos: os gatilhos só avisam quando uma área está ativa.
-  const floating = { hero: false, results: false, diagnostic: false, contact: false };
+  const floating = { hero: false, diagnostic: false, contact: false };
   const updateFloating = () => interactions?.setFloatingVisible(!Object.values(floating).some(Boolean));
   const floatingArea = area => visible => {
     floating[area] = visible;
@@ -193,7 +140,6 @@ async function boot() {
           onStatsEnter: () => counters.play(),
           onSectionChange: id => interactions?.setActiveSection(id),
           onHeroVisible: floatingArea('hero'),
-          onResultsVisible: floatingArea('results'),
           onDiagnosticVisible: floatingArea('diagnostic'),
           onContactVisible: floatingArea('contact'),
         },
@@ -213,7 +159,6 @@ async function boot() {
   performance.mark('zf:gsap');
 
   loadHeroScene(drawing);
-  initResults(smooth);
 }
 
 function teardown() {

@@ -9,7 +9,7 @@ test('diagnóstico: 3D com WebGL (mesmo com movimento reduzido); imagem sem WebG
   assert.equal(getDiagnosticMode({ webgl: true, saveData: false, lowPower: true }), 'imagem');
 });
 
-const base = { mobile: false, lowPower: false, reducedMotion: false, webgl: true };
+const base = { touchOnly: false, lowPower: false, reducedMotion: false, webgl: true };
 
 test('sem cena 3D com movimento reduzido, aparelho fraco ou sem WebGL', () => {
   assert.equal(getSceneConfig({ ...base, reducedMotion: true }), null);
@@ -17,17 +17,25 @@ test('sem cena 3D com movimento reduzido, aparelho fraco ou sem WebGL', () => {
   assert.equal(getSceneConfig({ ...base, webgl: false }), null);
 });
 
-test('celular recebe cena simplificada, não uma cópia reduzida do desktop', () => {
+test('aparelho de toque recebe cena simplificada, não uma cópia reduzida do desktop', () => {
   const desktop = getSceneConfig(base);
-  const mobile = getSceneConfig({ ...base, mobile: true });
-  assert.ok(mobile.particles < desktop.particles / 2);
-  assert.ok(mobile.nodes < desktop.nodes);
-  assert.ok(mobile.maxDpr <= 1.25);
-  assert.equal(mobile.fps, 30);
-  assert.equal(mobile.pointer, false);
-  // Modelo 3D só no desktop: no celular o desenho SVG continua.
-  assert.equal(mobile.scooter, false);
+  const toque = getSceneConfig({ ...base, touchOnly: true });
+  assert.ok(toque.particles < desktop.particles / 2);
+  assert.ok(toque.nodes < desktop.nodes);
+  assert.ok(toque.maxDpr <= 1.25);
+  assert.equal(toque.fps, 30);
+  assert.equal(toque.pointer, false);
+  // Modelo 3D só onde há mouse: no celular e no tablet o desenho SVG continua.
+  assert.equal(toque.scooter, false);
   assert.equal(desktop.scooter, true);
+});
+
+test('janela estreita no desktop continua sendo desktop (é o aparelho que decide, não a largura)', () => {
+  // Foi o caso que motivou a mudança: maximizada dava o 3D, restaurada ficava no desenho.
+  const janelaEstreita = getSceneConfig({ ...base, mobile: true });
+  assert.equal(janelaEstreita.scooter, true, 'o patinete 3D entra mesmo com a janela pequena');
+  assert.equal(janelaEstreita.fps, 60, 'sem queda de fluidez: menos pixels, mesma GPU');
+  assert.deepEqual(janelaEstreita, getSceneConfig(base));
 });
 
 test('devicePixelRatio sempre limitado', () => {

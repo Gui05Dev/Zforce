@@ -21,7 +21,7 @@ export function initSmoothScroll({ env }) {
   ScrollSmoother.get()?.kill();
 
   if (!wrapper || !content || env.reducedMotion || touchOnly) {
-    return { smoother: null, scrollTo: null, pause() {}, resume() {}, destroy() {} };
+    return { smoother: null, scrollTo: null, destroy() {} };
   }
 
   // Elemento que recebeu foco por navegação de âncora: já está sendo rolado até o topo,
@@ -84,8 +84,6 @@ export function initSmoothScroll({ env }) {
   return {
     smoother,
     scrollTo,
-    pause: () => smoother.paused(true),
-    resume: () => smoother.paused(false),
     destroy() {
       document.removeEventListener('click', onClick);
       window.removeEventListener('load', jumpToHash);

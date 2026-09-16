@@ -54,7 +54,8 @@ function buildShadow(size) {
 async function loadModel(urls, onProgress) {
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   let lastError;
-  // GLB otimizado primeiro; se falhar, o scene.gltf original (com scene.bin e textures/).
+  // Lista de tentativas em ordem de preferência. Hoje só o GLB otimizado é publicado; se ele falhar,
+  // quem chama cai para a imagem ilustrativa (ver interactiveDiagnostic.js).
   for (const url of urls) {
     try {
       return await loader.loadAsync(url, event => {

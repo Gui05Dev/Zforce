@@ -151,7 +151,7 @@ export function initDiagnostic({ root, env }) {
               components: COMPONENTS,
               hotspotElements,
               camera: CAMERA,
-              urls: [MODEL.otimizado, MODEL.original],
+              urls: [MODEL.otimizado],
               reducedMotion: reduced,
               touch: env.touchOnly,
               onProgress: ratio => setStatus(`Carregando modelo 3D… ${Math.round(ratio * 100)}%`),

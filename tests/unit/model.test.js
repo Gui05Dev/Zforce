@@ -46,6 +46,6 @@ test('modelo do diagnóstico otimizado: texturas preservadas, meshopt e bem meno
   const gltf = readGlbJson(DIAGNOSTIC_MODEL);
   assert.ok(gltf.extensionsUsed.includes('EXT_meshopt_compression'));
   assert.ok((gltf.images || []).length >= 1, 'texturas mantidas');
-  const original = statSync(new URL('../../public/assets/models/xiaomi-scooter/scene.bin', import.meta.url)).size / 1024;
+  const original = statSync(new URL('../../assets-src/models/xiaomi-scooter/scene.bin', import.meta.url)).size / 1024;
   assert.ok(kb < original / 5, 'ao menos 5× menor que o scene.bin original');
 });
