@@ -7,7 +7,7 @@
 import { WHATSAPP_NUMBER } from './contact.js';
 
 /** Endereço público do site, sempre com barra no fim (serve de base para as URLs absolutas). */
-const URL_BASE = 'https://gui05dev.github.io/Zforce/';
+const URL_BASE = 'https://zforce.com.br/';
 
 export const SITE = {
   url: URL_BASE,

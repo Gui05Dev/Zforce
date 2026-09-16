@@ -80,7 +80,9 @@ Não espalhe esses valores pelo código:
 
 - [js/data/contact.js](js/data/contact.js) — número de WhatsApp.
 - [js/data/site.js](js/data/site.js) — endereço público, textos de compartilhamento e JSON-LD.
-  Gera o `<head>` no build. **Trocar de domínio = mudar só `url` aqui.**
+  Gera o `<head>` no build, mais `robots.txt`, `sitemap.xml` e o `CNAME` do domínio próprio.
+  **Trocar de domínio = mudar só `url` aqui.** O site é publicado em `zforce.com.br`; o `CNAME`
+  precisa sair no artefato, senão um deploy pode derrubar a configuração do repositório.
 - [js/data/diagnostic.js](js/data/diagnostic.js) — componentes, hotspots, sintomas, etapas e
   caminhos do modelo. Gera o HTML da seção no build.
 

@@ -55,6 +55,14 @@ function seoFiles() {
     async generateBundle() {
       const { SITE } = await import(pathToFileURL(resolve(process.cwd(), 'js/data/site.js')).href);
       const lastmod = new Date().toISOString().slice(0, 10);
+      // Domínio próprio: sem o CNAME no artefato publicado, um deploy pode derrubar a configuração
+      // do repositório e o site volta a atender pelo endereço github.io.
+      const host = new URL(SITE.url).host;
+      if (!host.endsWith('.github.io')) {
+        this.emitFile({ type: 'asset', fileName: 'CNAME', source: `${host}
+` });
+      }
+
       this.emitFile({
         type: 'asset',
         fileName: 'robots.txt',

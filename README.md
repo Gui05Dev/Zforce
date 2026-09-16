@@ -26,10 +26,15 @@ npm run og:image           # regenera a imagem do card de compartilhamento (publ
 ```
 
 ## Publicação
+> **Configuração do Pages:** *Source* precisa estar em **GitHub Actions** (não em "Deploy from a
+> branch") e o *Custom domain* em `zforce.com.br`. Servindo da branch, o site sai sem título e sem
+> as seções geradas, porque o `index.html` da raiz ainda tem os marcadores `<!-- @meta -->` e
+> `<!-- @diagnostic -->` por substituir.
+
 **GitHub Pages (automático):** cada push na `main` roda `.github/workflows/deploy.yml`
 (instala, lint, testes unitários, build) e publica a pasta `dist/`. Configuração única no
 repositório: *Settings → Pages → Build and deployment → Source: GitHub Actions*. Site:
-https://gui05dev.github.io/Zforce/
+https://zforce.com.br/
 
 Os caminhos são relativos, então o `dist/` também funciona na raiz de outro domínio.
 Em Netlify/Vercel: comando `npm run build`, pasta `dist`.
