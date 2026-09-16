@@ -33,18 +33,25 @@ for (const viewport of VIEWPORTS) {
   });
 }
 
-test('ordem e numeração das seções', async ({ page }) => {
+test('ordem das seções, sem rótulo repetindo o menu nem numeração', async ({ page }) => {
   await page.goto('/');
   const ids = await page.$$eval('main > section[id]', els => els.map(el => el.id));
   expect(ids).toEqual(['inicio', 'servicos', 'como-funciona', 'sobre', 'contato']);
-  await expect(page.locator('main .rotulo > span')).toHaveText(['01', '02', '03', '04']);
   await expect(page.locator('#menu a')).toHaveText(['Serviços', 'Diagnóstico', 'Sobre', 'Contato']);
+  // Cada seção abre direto no <h2>: o eyebrow repetia o item de menu e, em dois casos, o título.
+  await expect(page.locator('main .rotulo, .servico-numero, .etapa-rotulo')).toHaveCount(0);
+  await expect(page.locator('main h2')).toHaveText([
+    'O que está acontecendo com o seu?',
+    'Explore o patinete e descubra onde pode estar o problema.',
+    'Sobre a Z-Force',
+    'Fale com a gente',
+  ]);
 });
 
 test('links de contato preservados', async ({ page }) => {
   await page.goto('/');
-  // 14 links que já existiam + 5 botões "Estou com este problema" do diagnóstico
-  await expect(page.locator('a[href^="https://wa.me/5545988037791?text="]')).toHaveCount(19);
+  // Os dados de contato deixaram de ser repetidos no CTA e no rodapé: agora só no rodapé.
+  await expect(page.locator('a[href^="https://wa.me/5545988037791?text="]')).toHaveCount(20);
   await expect(page.locator('a[href="tel:+5545988037791"]')).toHaveCount(3);
   await expect(page.locator('a[href="https://www.instagram.com/zforce_scooter/"]')).toHaveCount(2);
   await expect(page.locator('.problemas a')).toHaveCount(9);
@@ -104,14 +111,27 @@ test('menu desktop sem estouro entre 860px e 1180px', async ({ page }) => {
   }
 });
 
-test('números animam uma vez e terminam nos valores reais', async ({ page }) => {
+test('diferenciais: quatro blocos, sem número inventado, revelados ao chegar na tela', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.waitForTimeout(1200);
-  await scrollToElement(page, '[data-stats]', 0.4);
-  await page.waitForTimeout(2200);
-  await expect(page.locator('[data-count]')).toHaveText(['3', '8', '4', '100']);
-  await expect(page.locator('.numeros .sr-only')).toHaveText(['3', '8', '4', '100%']);
+  await scrollToElement(page, '[data-diferenciais]', 0.4);
+  await page.waitForTimeout(1800);
+
+  const itens = page.locator('[data-diferencial]');
+  await expect(itens).toHaveCount(4);
+  await expect(itens.locator('h3')).toHaveText([
+    'Diagnóstico especializado',
+    'Orçamento transparente',
+    'Reparo autorizado',
+    'Retirada e entrega',
+  ]);
+  // A entrada é do Motion: ao fim, todos visíveis.
+  for (const item of await itens.all()) {
+    expect(await item.evaluate(el => Number(getComputedStyle(el).opacity))).toBeGreaterThan(0.95);
+  }
+  // Nenhuma estatística: a seção não pode voltar a exibir números grandes.
+  await expect(page.locator('[data-count], .numero-valor')).toHaveCount(0);
 });
 
 test('contraste dos textos secundários', async ({ page }) => {
@@ -125,8 +145,7 @@ test('contraste dos textos secundários', async ({ page }) => {
     '.diagnostico-sintoma',
     '.diagnostico-aviso',
     '.etapa p:last-child',
-    '.numero-rotulo',
-    '.contato-lista small',
+    '.diferencial p',
   ];
   for (const selector of selectors) {
     expect(await contrastRatio(page, selector), selector).toBeGreaterThanOrEqual(6);
@@ -169,7 +188,7 @@ test.describe('prefers-reduced-motion', () => {
     await expect(page.locator('html')).not.toHaveClass(/has-smoother/);
     expect(await hiddenElements(page)).toEqual([]);
     await expect(page.locator('[data-hero-canvas] canvas')).toHaveCount(0);
-    await expect(page.locator('[data-count]')).toHaveText(['3', '8', '4', '100']);
+    await expect(page.locator('[data-diferencial]')).toHaveCount(4);
     const transform = await page.locator('#smooth-content').evaluate(el => getComputedStyle(el).transform);
     expect(transform).toBe('none');
     expect(problems).toEqual([]);
@@ -186,6 +205,6 @@ test.describe('JavaScript desativado', () => {
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('#menu a').first()).toBeVisible();
     await expect(page.locator('.problemas a').first()).toBeVisible();
-    await expect(page.locator('[data-count]').last()).toHaveText('100');
+    await expect(page.locator('[data-diferencial]').last()).toContainText('Retirada e entrega');
   });
 });

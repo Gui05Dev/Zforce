@@ -68,7 +68,14 @@ test('HTML gerado: botões acessíveis, cards, sintomas, CTA, aviso e quatro eta
   assert.match(html, /Modelo meramente ilustrativo\./);
   assert.match(html, /id="diagnostico-descricao"/);
   assert.equal((html.match(/class="etapa"/g) || []).length, STEPS.length);
-  assert.deepEqual(STEPS.map(s => s.rotulo), ['Conversa', 'Avaliação', 'Orçamento', 'Entrega']);
+  // O rótulo curto de cada etapa saiu: repetia o próprio título em três das quatro.
+  assert.deepEqual(STEPS.map(s => s.titulo), [
+    'Primeiro, a conversa',
+    'Depois, a avaliação',
+    'Orçamento antes do serviço',
+    'Pronto para rodar',
+  ]);
+  assert.ok(!STEPS.some(s => 'rotulo' in s), 'rótulo removido de propósito');
 });
 
 test('modelo original completo em assets-src/ (fonte dos scripts de otimização)', () => {

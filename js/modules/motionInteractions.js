@@ -20,7 +20,8 @@ export function initInteractions({ env }) {
   const menu = mobileMenu(reduced, track);
   const indicator = navIndicator(reduced, track);
   const floating = floatingWhats(reduced, track);
-  if (!reduced) scrollCue(track);
+  entradaEmSequencia('[data-diferenciais]', '[data-diferencial]', reduced, track);
+  rodape(reduced, track);
 
   return {
     setActiveSection(id) {
@@ -332,13 +333,53 @@ function floatingWhats(reduced, track) {
   };
 }
 
-function scrollCue(track) {
-  const dot = $('[data-scroll-dot]');
-  if (!dot) return;
-  // Só anima enquanto estiver visível; ao sair da tela o loop é parado.
+/**
+ * Entrada escalonada de um grupo quando ele chega à tela.
+ *
+ * Com "reduzir movimento" nada é escondido: os elementos já estão no estado final, então a função
+ * sai antes de tocar em qualquer estilo. O mesmo vale se este módulo falhar ao carregar — quem
+ * esconde é o JavaScript, nunca o CSS, e por isso nada some sem o script para revelar de volta.
+ */
+function entradaEmSequencia(seletorGrupo, seletorItem, reduced, track, { y = 18, atraso = 0.08 } = {}) {
+  const grupo = $(seletorGrupo);
+  if (!grupo || reduced) return;
+  const itens = $$(seletorItem, grupo);
+  if (!itens.length) return;
+
+  itens.forEach(el => (el.style.opacity = '0'));
   track(
-    inView(dot, () => {
-      const loop = animate(dot, { y: [0, 14], opacity: [1, 0] }, { duration: 1.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 0.4 });
+    inView(
+      grupo,
+      () => {
+        animate(
+          itens,
+          { opacity: [0, 1], y: [y, 0] },
+          { duration: 0.5, ease: easeOut, delay: stagger(atraso) },
+        );
+      },
+      { margin: '0px 0px -12% 0px' },
+    ),
+  );
+}
+
+/** Rodapé: marca, colunas e parte legal entram em sequência; o brilho respira bem devagar. */
+function rodape(reduced, track) {
+  const raiz = $('[data-rodape]');
+  if (!raiz) return;
+
+  entradaEmSequencia('[data-rodape]', '[data-rodape-item]', reduced, track, { y: 22, atraso: 0.09 });
+
+  // Movimento muito lento no brilho: 22 s por ciclo, só deslocamento e opacidade, e apenas
+  // enquanto o rodapé está na tela. Nada de rotação ou de elemento flutuando sem parar à vista.
+  const brilho = $('[data-rodape-brilho]', raiz);
+  if (!brilho || reduced) return;
+  track(
+    inView(raiz, () => {
+      const loop = animate(
+        brilho,
+        { opacity: [0.75, 1, 0.75], x: ['-3%', '3%', '-3%'] },
+        { duration: 22, ease: 'easeInOut', repeat: Infinity },
+      );
       return () => loop.stop();
     }),
   );

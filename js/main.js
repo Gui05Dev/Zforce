@@ -4,7 +4,7 @@ import { getSceneConfig, readEnvironment } from './modules/env.js';
 import { initSmoothScroll } from './modules/smoothScroll.js';
 import { initScrollAnimations } from './modules/gsapScrollAnimations.js';
 import { initInteractions } from './modules/motionInteractions.js';
-import { createCounters, createHeroDrawing } from './modules/animeCounters.js';
+import { createHeroDrawing } from './modules/animeCounters.js';
 import { initDiagnostic } from './modules/interactiveDiagnostic.js';
 
 const root = document.documentElement;
@@ -107,7 +107,6 @@ async function boot() {
     handOff() {},
     restore() {},
   });
-  const counters = safely('Anime (números)', () => createCounters($('[data-stats]'), env), { play() {} });
   if (interactions) cleanups.push(() => interactions.destroy());
   performance.mark('zf:motion-anime');
 
@@ -137,7 +136,6 @@ async function boot() {
         env,
         hooks: {
           onHeroDrawing: () => drawing.play(),
-          onStatsEnter: () => counters.play(),
           onSectionChange: id => interactions?.setActiveSection(id),
           onHeroVisible: floatingArea('hero'),
           onDiagnosticVisible: floatingArea('diagnostic'),
@@ -153,7 +151,6 @@ async function boot() {
     // Sem o orquestrador de scroll, tudo vai direto ao estado final visível.
     root.classList.remove('anim');
     drawing.play();
-    counters.play();
   }
   root.classList.add('anim-ready');
   performance.mark('zf:gsap');

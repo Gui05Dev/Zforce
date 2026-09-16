@@ -21,7 +21,7 @@ import { removeLogoTriangles, ROOT as root, SOURCE } from './model-shared.mjs';
 
 const OUTPUT = resolve(root, 'assets/models/patinete-zforce.glb');
 
-// Materiais que viram "destaque" (arestas laranja).
+// Materiais que viram "destaque" (arestas na cor da marca).
 const HIGHLIGHT = /Vermelho|Refletor|Reflectores|Vidro|Paine|Botoes/;
 // Limiar de ângulo (graus) para considerar uma aresta: maior = menos linhas.
 // Pneus, manoplas e o tapete de pontos (Roda_1) têm relevo fino que cintilaria ao girar.

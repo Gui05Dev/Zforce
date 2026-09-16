@@ -22,14 +22,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import modelUrl from '../../assets/models/patinete-zforce.glb?url';
 
-const ORANGE = new Color('#ff6a13');
+// Verde da marca (assets/zforce-logo-animated.svg): arestas de destaque e luz de recorte.
+const BRAND = new Color('#a8e000');
 const FOV = 26;
 const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const clamp01 = t => Math.min(1, Math.max(0, t));
 
 /**
  * Material com "varredura de desenho": fragmentos além de uReveal (ao longo do comprimento do patinete,
- * da traseira para a frente) são descartados; nas linhas, a frente da varredura brilha em laranja.
+ * da traseira para a frente) são descartados; nas linhas, a frente da varredura brilha na cor da marca.
  */
 function withReveal(material, uniforms, { glow = false } = {}) {
   material.onBeforeCompile = shader => {
@@ -68,7 +69,7 @@ export async function createScooterLayer({ renderer, drawing, pointer }) {
   scene.add(new HemisphereLight('#c9ccd4', '#0a0a0b', 0.55));
   const key = new DirectionalLight('#ffffff', 1.25);
   key.position.set(-2, 3, 1.5);
-  const rim = new DirectionalLight(ORANGE, 2.4);
+  const rim = new DirectionalLight(BRAND, 2.4);
   rim.position.set(2, 1, -2.5);
   scene.add(key, rim);
 
@@ -85,7 +86,7 @@ export async function createScooterLayer({ renderer, drawing, pointer }) {
     uReveal: { value: 0 },
     uRevealMin: { value: box.min.z },
     uRevealSpan: { value: size.z },
-    uGlow: { value: ORANGE },
+    uGlow: { value: BRAND },
   };
   const disposables = [];
   model.updateMatrixWorld(true);
@@ -112,7 +113,7 @@ export async function createScooterLayer({ renderer, drawing, pointer }) {
       );
     } else {
       object.material = withReveal(
-        new LineBasicMaterial({ color: highlight ? ORANGE : '#dcdad4', transparent: true, opacity: highlight ? 0.95 : 0.5 }),
+        new LineBasicMaterial({ color: highlight ? BRAND : '#dcdad4', transparent: true, opacity: highlight ? 0.95 : 0.5 }),
         own,
         { glow: true },
       );

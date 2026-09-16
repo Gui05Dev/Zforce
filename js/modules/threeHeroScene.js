@@ -1,6 +1,6 @@
 // Three.js: fundo do hero. Carregado sob demanda (import dinâmico) e só quando o aparelho aguenta.
 // Três camadas leves: partículas em fluxo (movimento calculado na GPU), uma rede de pontos
-// conectados calculada uma vez e poucos "fios de energia" com um pulso laranja percorrendo.
+// conectados calculada uma vez e poucos "fios de energia" com um pulso da marca percorrendo.
 // No desktop, uma quarta camada opcional (threeScooter.js, também sob demanda) desenha o patinete 3D
 // no mesmo contexto e no mesmo loop, sobre a área do desenho técnico.
 import {
@@ -18,7 +18,8 @@ import {
   WebGLRenderer,
 } from 'three';
 
-const ORANGE = new Color('#ff6a13');
+// Azul da marca (assets/zforce-logo-animated.svg): partículas, fios de energia e pulsos.
+const BRAND = new Color('#00c2d1');
 const WARM_WHITE = new Color('#f4efe8');
 
 /**
@@ -181,7 +182,7 @@ function buildParticles(count) {
     positions[i * 3 + 1] = (Math.random() * 2 - 1) * 8;
     positions[i * 3 + 2] = Math.random() * -14 + 3;
     seeds[i * 3] = Math.random(); // velocidade
-    seeds[i * 3 + 1] = Math.random(); // tom (laranja x branco)
+    seeds[i * 3 + 1] = Math.random(); // tom (azul da marca x branco)
     seeds[i * 3 + 2] = Math.random() * Math.PI * 2; // fase
   }
 
@@ -195,7 +196,7 @@ function buildParticles(count) {
     blending: AdditiveBlending,
     uniforms: {
       uTime: { value: 0 },
-      uOrange: { value: ORANGE },
+      uBrand: { value: BRAND },
       uWhite: { value: WARM_WHITE },
     },
     vertexShader: /* glsl */ `
@@ -220,14 +221,14 @@ function buildParticles(count) {
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uOrange;
+      uniform vec3 uBrand;
       uniform vec3 uWhite;
       varying float vTone;
       varying float vAlpha;
       void main() {
         float d = length(gl_PointCoord - 0.5);
         float disc = smoothstep(0.5, 0.0, d);
-        vec3 color = vTone > 0.62 ? uOrange : uWhite * 0.55;
+        vec3 color = vTone > 0.62 ? uBrand : uWhite * 0.55;
         gl_FragColor = vec4(color, disc * vAlpha);
       }
     `,
@@ -268,7 +269,7 @@ function buildNetwork(count) {
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
-    uniforms: { uColor: { value: ORANGE } },
+    uniforms: { uColor: { value: BRAND } },
     vertexShader: /* glsl */ `
       varying float vDepth;
       void main() {
@@ -301,7 +302,7 @@ function buildStreams(count) {
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uColor: { value: ORANGE } },
+    uniforms: { uTime: { value: 0 }, uColor: { value: BRAND } },
     vertexShader: /* glsl */ `
       attribute float aProgress;
       attribute float aOffset;

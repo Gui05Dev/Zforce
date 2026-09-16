@@ -26,6 +26,16 @@ npm run og:image          # regenera public/assets/og-zforce.jpg
 npm run diagnostic:poster # regenera a imagem de fallback do diagnóstico
 ```
 
+## Cores da marca
+
+Azul e verde saem de `assets/zforce-logo-animated.svg` e estão em variáveis no `:root`:
+`--brand-blue` (#00c2d1, cor principal), `--brand-green` (#a8e000, destaque), `--brand-gradient`,
+`--brand-glow` e `--brand-fundo`. **Nada de laranja** — a identidade anterior foi removida por
+completo, inclusive nos shaders do Three.js e no template da imagem de compartilhamento.
+
+O gradiente cheio fica reservado ao CTA e a detalhes finos (fio do rodapé, traço dos rótulos).
+Fundos seguem pretos e cinza-escuros.
+
 ## Camadas de animação (regra principal)
 
 Cada biblioteca é dona de um território. **Nunca deixe duas bibliotecas animando a mesma
@@ -35,7 +45,7 @@ propriedade do mesmo elemento** — é a origem mais provável de bug visual aqu
 | --- | --- |
 | **GSAP** (ScrollTrigger, ScrollSmoother, SplitText) | Rolagem, entrada do hero, revelações, gatilhos de seção |
 | **Motion** | Resposta à interação: hover, press, menu, indicadores, troca de card |
-| **Anime.js** | Desenho técnico em SVG do hero e os contadores da seção Sobre |
+| **Anime.js** | Desenho técnico em SVG do hero |
 | **Three.js** | Tudo dentro de `<canvas>`, mais a posição dos hotspots do diagnóstico |
 
 Exemplo do limite: no diagnóstico o GSAP revela os blocos, o Three posiciona os pontos sobre o

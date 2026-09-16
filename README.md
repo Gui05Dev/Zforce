@@ -75,11 +75,11 @@ compartilhamento precisam ser absolutas e ficariam apontando para o endereço an
 | Módulo | Biblioteca | Controla |
 | --- | --- | --- |
 | `js/modules/smoothScroll.js` | GSAP ScrollSmoother 3.15 | Rolagem suave no desktop, `data-speed`/`data-lag` decorativos, âncoras abaixo do topo fixo |
-| `js/modules/gsapScrollAnimations.js` | GSAP 3.15 + ScrollTrigger + SplitText | Entrada do hero, revelações (inclusive dos blocos do diagnóstico), feixes, barra de progresso, gatilhos das seções |
+| `js/modules/gsapScrollAnimations.js` | GSAP 3.15 + ScrollTrigger + SplitText | Entrada do hero, revelações (inclusive dos blocos do diagnóstico), feixes, gatilhos das seções |
 | `js/modules/threeHeroScene.js` | Three.js 0.186 | Fundo do hero (import dinâmico) e loop único de renderização |
 | `js/modules/threeScooter.js` | Three.js 0.186 (GLTFLoader + meshopt) | Patinete 3D que substitui o desenho no desktop (import dinâmico) |
 | `js/modules/motionInteractions.js` | Motion 13 | Botões, cards, menu mobile, indicador do menu, WhatsApp flutuante, indicador de rolagem |
-| `js/modules/animeCounters.js` | Anime.js 4.5 | Desenho técnico do hero e contadores |
+| `js/modules/animeCounters.js` | Anime.js 4.5 | Desenho técnico do hero |
 | `js/modules/interactiveDiagnostic.js` | Motion 13 | Diagnóstico: seleção, troca do card, sintomas, WhatsApp, carregamento sob demanda e fallback |
 | `js/modules/scooterViewer.js` | Three.js 0.186 (GLTFLoader, OrbitControls, meshopt) | Diagnóstico: modelo, câmera, luzes, controles e posição dos pontos (import dinâmico) |
 | `js/data/diagnostic.js` | — | **Fonte única** do diagnóstico: pontos 3D, sintomas, mensagens, etapas e caminhos do modelo |
@@ -163,8 +163,8 @@ do hero (SVG e 3D) para não repetir o Diagnóstico interativo; o desenho manté
   meramente ilustrativo e não indica parceria com a Xiaomi.
 - O crédito exigido está no rodapé do site. **Não remova** enquanto o modelo for usado.
 - Modificações (feitas por `scripts/optimize-scooter.mjs`): texturas descartadas, símbolo do
-  fabricante removido do deck, acabamento técnico (corpo grafite, arestas claras, destaques em
-  laranja), malha simplificada e comprimida.
+  fabricante removido do deck, acabamento técnico (corpo grafite, arestas claras, destaques no
+  verde da marca), malha simplificada e comprimida.
 
 ### Otimização (`npm run model:build`)
 
@@ -192,11 +192,12 @@ própria. Para mudar uma mensagem, gere o texto com
 `encodeURIComponent("sua mensagem")` no console do navegador e troque o valor
 depois de `text=`.
 
-## Números da seção "Sobre"
-Não há estatísticas de clientes. Os números vêm do próprio conteúdo do site
-(3 tipos de veículo, 8 problemas listados, 4 etapas, orçamento aprovado antes de
-todo conserto). Se a Z-Force tiver dados reais, troque `data-count` e o texto
-`sr-only` correspondente em `index.html`.
+## Diferenciais da seção "Sobre"
+No lugar dos antigos contadores (3 tipos de veículo, 8 problemas, 4 etapas, 100%) estão quatro
+diferenciais com ícone, título e descrição, editáveis direto no `index.html`. A troca foi
+proposital: aqueles números descreviam o próprio site, não o atendimento, e passavam por
+estatística sem ser. **Não invente número de clientes, de reparos ou de anos de experiência** —
+sem dado verificável, um diferencial qualitativo vale mais.
 
 ## O que falta (conteúdo real)
 - **Fotos reais** da oficina, da equipe e de reparos (antes/depois). A seção "Resultados"
@@ -205,6 +206,6 @@ todo conserto). Se a Z-Force tiver dados reais, troque `data-count` e o texto
 - Endereço completo e horário de atendimento, se houver ponto físico.
 - O patinete 3D é um modelo genérico de mercado (sem marca visível): uma foto ou modelo dos
   veículos realmente atendidos reforçaria a identidade.
-- Logotipo: `assets/zforce-mark.webp` usa ciano/limão; uma versão alinhada ao
-  laranja deixaria a identidade mais coesa. `assets/zforce-logo-animated.svg`
-  não é usado no site.
+- Logotipo: a identidade do site agora segue o ciano e o verde-limão de
+  `assets/zforce-logo-animated.svg`, então a marca e a interface estão coesas. O SVG animado
+  continua servindo só como fonte das cores, sem ser exibido em nenhuma página.

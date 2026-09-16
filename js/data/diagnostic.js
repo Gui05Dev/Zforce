@@ -87,10 +87,10 @@ export const COMPONENTS = [
 ];
 
 export const STEPS = [
-  { numero: '01', rotulo: 'Conversa', titulo: 'Primeiro, a conversa', texto: 'O cliente envia uma mensagem com foto ou vídeo.' },
-  { numero: '02', rotulo: 'Avaliação', titulo: 'Depois, a avaliação', texto: 'A Z-Force verifica o veículo e identifica o problema.' },
-  { numero: '03', rotulo: 'Orçamento', titulo: 'Orçamento antes do serviço', texto: 'O cliente recebe o valor e decide se deseja aprovar.' },
-  { numero: '04', rotulo: 'Entrega', titulo: 'Pronto para rodar', texto: 'Após o serviço, o veículo é retirado ou entregue conforme combinado.' },
+  { titulo: 'Primeiro, a conversa', texto: 'O cliente envia uma mensagem com foto ou vídeo.' },
+  { titulo: 'Depois, a avaliação', texto: 'A Z-Force verifica o veículo e identifica o problema.' },
+  { titulo: 'Orçamento antes do serviço', texto: 'O cliente recebe o valor e decide se deseja aprovar.' },
+  { titulo: 'Pronto para rodar', texto: 'Após o serviço, o veículo é retirado ou entregue conforme combinado.' },
 ];
 
 /** Mensagem do WhatsApp para um componente e (opcionalmente) um sintoma. */
@@ -145,9 +145,8 @@ export function renderDiagnostic() {
   ).join('');
 
   const cards = COMPONENTS.map(
-    (c, i) => `
+    c => `
           <article class="diagnostico-card" id="diagnostico-card-${c.id}" data-card-component="${c.id}" aria-labelledby="diagnostico-titulo-${c.id}">
-            <p class="diagnostico-card-rotulo">Componente <span>${pad(i + 1)}</span></p>
             <h3 id="diagnostico-titulo-${c.id}">${e(c.nome)}</h3>
             <p class="diagnostico-card-resumo">${e(c.resumo)}</p>
             <p class="diagnostico-card-texto" id="diagnostico-instrucao-${c.id}">Sintomas mais comuns. Selecione o que mais se parece com o seu:</p>
@@ -168,7 +167,6 @@ export function renderDiagnostic() {
   const steps = STEPS.map(
     s => `
         <li class="etapa" data-reveal-block>
-          <p class="etapa-rotulo"><span>${s.numero}</span> ${e(s.rotulo)}</p>
           <h3>${e(s.titulo)}</h3>
           <p>${e(s.texto)}</p>
         </li>`,

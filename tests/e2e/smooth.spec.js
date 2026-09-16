@@ -49,7 +49,8 @@ test.describe('desktop com ScrollSmoother', () => {
     // (o auto-scroll do Playwright moveria o wrapper do ScrollSmoother, não a página).
     await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
     await page.waitForTimeout(SETTLE);
-    const back = await page.locator('.rodape a[href="#inicio"]').boundingBox();
+    // O rodapé tem dois links para #inicio (a marca e o "Voltar ao início"): aponta para o botão.
+    const back = await page.locator('.rodape-topo').boundingBox();
     await page.mouse.click(back.x + back.width / 2, back.y + back.height / 2);
     await page.waitForTimeout(SETTLE + 600);
     expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(2);

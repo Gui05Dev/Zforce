@@ -19,7 +19,6 @@ const noop = () => {};
 export function initScrollAnimations({ env, hooks = {} }) {
   const {
     onHeroDrawing = noop,
-    onStatsEnter = noop,
     onSectionChange = noop,
     onHeroVisible = noop,
     onContactVisible = noop,
@@ -82,11 +81,6 @@ export function initScrollAnimations({ env, hooks = {} }) {
         onToggle: self => onDiagnosticVisible(self.isActive),
       });
     }
-
-    const stats = $('[data-stats]');
-    if (stats) {
-      ScrollTrigger.create({ trigger: stats, start: 'top 82%', once: true, onEnter: () => onStatsEnter() });
-    }
   });
 
   let intro = null;
@@ -101,13 +95,6 @@ export function initScrollAnimations({ env, hooks = {} }) {
       mm.add('(prefers-reduced-motion: no-preference)', () => scrollReveals({ mobile, lowPower: env.lowPower }));
 
       // Parallax: feito pelo ScrollSmoother (data-speed / data-lag em elementos decorativos).
-
-      const progress = $('[data-progress]');
-      if (progress) {
-        structure.add(() => {
-          gsap.to(progress, { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.4 } });
-        });
-      }
     } catch (error) {
       // Desfaz estados iniciais parciais para nenhum conteúdo ficar invisível.
       mm.revert();
@@ -144,7 +131,6 @@ function heroIntro({ onHeroDrawing, mobile }) {
   const [eyebrow, lead, actions] = $$('[data-hero-item]', hero);
   const figure = $('[data-hero-figure]', hero);
   const strip = $('[data-hero-strip]', hero);
-  const cue = $('[data-scroll-cue]', hero);
   const beams = $('[data-hero-beams]', hero);
 
   const split = title ? SplitText.create(title, { type: 'lines', mask: 'lines' }) : null;
@@ -177,26 +163,11 @@ function heroIntro({ onHeroDrawing, mobile }) {
   if (strip) {
     tl.set(strip, { opacity: 1 }, 0.4).from(strip.children, { opacity: 0, y: 14, stagger: 0.07, duration: 0.7 }, 0.4);
   }
-  enter(cue, { y: 12 }, 0.6, { duration: 0.7 });
 }
 
 function scrollReveals({ mobile, lowPower }) {
-  const distance = mobile ? 22 : 40;
-
-  // Títulos: linhas sobem de dentro de uma máscara.
-  $$('[data-reveal="heading"]').forEach(heading => {
-    const split = SplitText.create(heading, { type: 'lines', mask: 'lines' });
-    gsap.from(split.lines, {
-      yPercent: 108,
-      duration: 1.1,
-      ease: 'expo.out',
-      stagger: 0.08,
-      scrollTrigger: { trigger: heading, start: 'top 92%', once: true },
-      onComplete: () => split.revert(),
-    });
-  });
-
-  batchReveal('[data-reveal="fade"]', { y: distance, stagger: 0.08, start: 'top 94%', duration: 0.9 });
+  // A entrada por linhas mascaradas fica só no hero e no CTA final: repetida em todo h2, o
+  // efeito virava ruído e atrasava a leitura de cada seção.
 
   // Cards de serviço: o GSAP move o <li>; o card interno é do Motion.
   batchReveal('.servico', { y: mobile ? 28 : 56, scale: mobile ? 1 : 0.98, stagger: 0.1, start: 'top 94%', duration: 0.95 });
@@ -204,18 +175,6 @@ function scrollReveals({ mobile, lowPower }) {
   // Blocos revelados como um todo: palco 3D, painel do diagnóstico e etapas. O conteúdo
   // interno pertence a outras camadas (Three.js nos hotspots, Motion no card).
   batchReveal('[data-reveal-block]', { y: mobile ? 24 : 44, stagger: 0.08, start: 'top 94%', duration: 0.95 });
-
-  const statsList = $('[data-stats]');
-  if (statsList) {
-    gsap.from($$('[data-stat]', statsList), {
-      opacity: 0,
-      y: distance,
-      duration: 1,
-      ease: 'expo.out',
-      stagger: 0.1,
-      scrollTrigger: { trigger: statsList, start: 'top 82%', once: true },
-    });
-  }
 
   ctaReveal({ mobile });
 

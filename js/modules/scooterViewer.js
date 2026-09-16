@@ -114,7 +114,7 @@ export async function createScooterViewer({
   scene.add(new HemisphereLight('#e8ebf2', '#1a1a1d', 1.35));
   const key = new DirectionalLight('#ffffff', 2.3);
   key.position.set(-2.4, 3.2, 2.2);
-  const rim = new DirectionalLight('#ff6a13', 4); // luz de recorte laranja, por trás
+  const rim = new DirectionalLight('#00c2d1', 4); // luz de recorte azul da marca, por trás
   rim.position.set(2.6, 1.6, -2.8);
   const fill = new DirectionalLight('#b4bccb', 0.9);
   fill.position.set(2, 0.5, 2.5);
