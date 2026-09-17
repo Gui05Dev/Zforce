@@ -78,7 +78,7 @@ compartilhamento precisam ser absolutas e ficariam apontando para o endereço an
 | `js/modules/gsapScrollAnimations.js` | GSAP 3.15 + ScrollTrigger + SplitText | Entrada do hero, revelações (inclusive dos blocos do diagnóstico), feixes, gatilhos das seções |
 | `js/modules/threeHeroScene.js` | Three.js 0.186 | Fundo do hero (import dinâmico) e loop único de renderização |
 | `js/modules/threeScooter.js` | Three.js 0.186 (GLTFLoader + meshopt) | Patinete 3D que substitui o desenho no desktop (import dinâmico) |
-| `js/modules/motionInteractions.js` | Motion 13 | Botões, cards, menu mobile, indicador do menu, WhatsApp flutuante, indicador de rolagem |
+| `js/modules/motionInteractions.js` | Motion 13 | Botões, cards, menu mobile, indicador do menu, indicador de rolagem |
 | `js/modules/animeCounters.js` | Anime.js 4.5 | Desenho técnico do hero |
 | `js/modules/interactiveDiagnostic.js` | Motion 13 | Diagnóstico: seleção, troca do card, sintomas, WhatsApp, carregamento sob demanda e fallback |
 | `js/modules/scooterViewer.js` | Three.js 0.186 (GLTFLoader, OrbitControls, meshopt) | Diagnóstico: modelo, câmera, luzes, controles e posição dos pontos (import dinâmico) |
@@ -94,7 +94,7 @@ Regras:
   Motion anima a troca do card e a resposta dos botões.
 - O ScrollSmoother é criado antes de qualquer ScrollTrigger. Não é criado com
   `prefers-reduced-motion` nem em aparelhos só de toque (rolagem nativa).
-- Topo e WhatsApp flutuante ficam **fora** de `#smooth-content`.
+- O topo fica **fora** de `#smooth-content`.
 - `data-speed`/`data-lag` só em elementos decorativos (fundo 3D, feixes, desenho técnico).
 - Sem JavaScript, com `prefers-reduced-motion` ou se algum módulo falhar, todo o conteúdo
   fica visível no estado final. Sem WebGL, o hero usa o fundo em CSS.

@@ -54,7 +54,7 @@ modelo e o Motion anima a troca do card. Nenhum toca no que é do outro.
 Outras regras de scroll:
 - O **ScrollSmoother é criado antes de qualquer ScrollTrigger**. Não é criado com
   `prefers-reduced-motion` nem em aparelhos só de toque (lá a rolagem é nativa).
-- Topo fixo e WhatsApp flutuante ficam **fora** de `#smooth-content` (não podem sofrer transform).
+- O topo fixo fica **fora** de `#smooth-content` (não pode sofrer transform).
 - `data-speed` / `data-lag` só em elementos decorativos.
 
 Feedback de interação (press, hover) é rápido de propósito — 100–200 ms. Só transição de conteúdo

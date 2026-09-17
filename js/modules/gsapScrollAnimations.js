@@ -17,13 +17,7 @@ const noop = () => {};
  * @param {object} options.hooks callbacks para os outros módulos
  */
 export function initScrollAnimations({ env, hooks = {} }) {
-  const {
-    onHeroDrawing = noop,
-    onSectionChange = noop,
-    onHeroVisible = noop,
-    onContactVisible = noop,
-    onDiagnosticVisible = noop,
-  } = hooks;
+  const { onHeroDrawing = noop, onSectionChange = noop } = hooks;
   const animate = !env.reducedMotion;
   const mobile = env.mobile;
   // A trava do index.html remove .anim quando este bundle demora mais de 1,2 s: o hero já foi
@@ -45,42 +39,6 @@ export function initScrollAnimations({ env, hooks = {} }) {
         onToggle: self => self.isActive && onSectionChange(section.id),
       });
     });
-
-    const hero = $('[data-hero]');
-    if (hero) {
-      ScrollTrigger.create({
-        trigger: hero,
-        // 'top bottom': o hero fica abaixo do topo fixo, então 'top top' nunca estaria ativo no início.
-        start: 'top bottom',
-        end: 'bottom 35%',
-        onToggle: self => onHeroVisible(self.isActive),
-      });
-    }
-
-    // Do CTA até o fim da página o WhatsApp flutuante sai de cena: o botão principal já está ali
-    // e o rodapé ("Voltar ao início") fica livre.
-    const contact = $('#contato');
-    if (contact) {
-      ScrollTrigger.create({
-        trigger: contact,
-        start: 'top 75%',
-        // +1: no fim exato da página o gatilho ainda conta como ativo (com 'max' ele "sairia").
-        end: () => ScrollTrigger.maxScroll(window) + 1,
-        invalidateOnRefresh: true,
-        onToggle: self => onContactVisible(self.isActive),
-      });
-    }
-
-    // Diagnóstico: o WhatsApp flutuante cobriria o modelo, os pontos e os botões no celular.
-    const diagnostic = $('.diagnostico');
-    if (diagnostic) {
-      ScrollTrigger.create({
-        trigger: diagnostic,
-        start: 'top bottom',
-        end: 'bottom top',
-        onToggle: self => onDiagnosticVisible(self.isActive),
-      });
-    }
   });
 
   let intro = null;
@@ -128,7 +86,9 @@ function heroIntro({ onHeroDrawing, mobile }) {
   const hero = $('[data-hero]');
   if (!hero) return;
   const title = $('[data-hero-title]', hero);
-  const [eyebrow, lead, actions] = $$('[data-hero-item]', hero);
+  // Por nome, não por posição: remover um item do hero não pode deslocar a entrada dos outros.
+  const lead = $('[data-hero-item="lead"]', hero);
+  const actions = $('[data-hero-item="acoes"]', hero);
   const figure = $('[data-hero-figure]', hero);
   const strip = $('[data-hero-strip]', hero);
   const beams = $('[data-hero-beams]', hero);
@@ -146,7 +106,6 @@ function heroIntro({ onHeroDrawing, mobile }) {
     el && tl.fromTo(el, { opacity: 0, ...from }, { opacity: 1, x: 0, y: 0, ...vars }, position);
 
   // Tempos enxutos: todo o texto do hero fica legível em ~1 s; o desenho começa junto com o título.
-  enter(eyebrow, { x: -18 }, 0, { duration: 0.7 });
   if (split) {
     tl.set(title, { opacity: 1 }, 0).from(split.lines, { yPercent: 108, duration: 1, stagger: 0.07 }, 0.05);
   }
@@ -160,7 +119,8 @@ function heroIntro({ onHeroDrawing, mobile }) {
   });
   tl.call(onHeroDrawing, null, mobile ? 0.35 : 0.15);
   enter(beams, {}, 0.3, { duration: 1.4, ease: 'power2.out' });
-  if (strip) {
+  // children pode estar vazio se a faixa perder os itens: o GSAP avisaria no console.
+  if (strip?.children.length) {
     tl.set(strip, { opacity: 1 }, 0.4).from(strip.children, { opacity: 0, y: 14, stagger: 0.07, duration: 0.7 }, 0.4);
   }
 }

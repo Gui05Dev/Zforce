@@ -1,18 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { SETTLE, scrollToElement, watchConsole } from './helpers.js';
+import { SETTLE, watchConsole } from './helpers.js';
 
 const headerHeight = page => page.locator('[data-topo]').evaluate(el => el.offsetHeight);
 const topOf = (page, selector) => page.locator(selector).evaluate(el => el.getBoundingClientRect().top);
-const floatingState = page =>
-  page.locator('[data-floating-whats]').evaluate(el => ({
-    visible: Number(getComputedStyle(el).opacity) > 0.9 && getComputedStyle(el).visibility === 'visible',
-    focusable: el.getAttribute('tabindex') !== '-1',
-  }));
 
 test.describe('desktop com ScrollSmoother', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('instância única; topo, WhatsApp e lightbox fora do conteúdo transformado', async ({ page }) => {
+  test('instância única; topo e lightbox fora do conteúdo transformado', async ({ page }) => {
     const problems = watchConsole(page);
     await page.goto('/');
     await expect(page.locator('html')).toHaveClass(/has-smoother/);
@@ -20,7 +15,7 @@ test.describe('desktop com ScrollSmoother', () => {
 
     const outside = await page.evaluate(() => {
       const wrapper = document.getElementById('smooth-wrapper');
-      return ['[data-topo]', '[data-floating-whats]', '.skip-link'].every(sel => !wrapper.contains(document.querySelector(sel)));
+      return ['[data-topo]', '.skip-link'].every(sel => !wrapper.contains(document.querySelector(sel)));
     });
     expect(outside).toBe(true);
 
@@ -70,37 +65,6 @@ test.describe('desktop com ScrollSmoother', () => {
     await expect(page.locator('#conteudo')).toBeFocused();
   });
 });
-
-for (const viewport of [
-  { width: 1440, height: 900 },
-  { width: 390, height: 844 },
-]) {
-  test(`WhatsApp flutuante ${viewport.width}px: fora do hero, do diagnóstico e do CTA/rodapé`, async ({ page }) => {
-    await page.setViewportSize(viewport);
-    await page.goto('/');
-    await page.waitForTimeout(1500);
-    expect(await floatingState(page)).toEqual({ visible: false, focusable: false });
-
-    await scrollToElement(page, '.servicos', 0.1);
-    expect(await floatingState(page)).toEqual({ visible: true, focusable: true });
-
-    await scrollToElement(page, '.diagnostico', 0.1);
-    expect(await floatingState(page)).toEqual({ visible: false, focusable: false });
-
-    await scrollToElement(page, '#sobre', 0.1);
-    expect(await floatingState(page)).toEqual({ visible: true, focusable: true });
-
-    // Afastado das bordas com margem mínima (medido visível, sem a escala da animação de saída).
-    const box = await page.locator('[data-floating-whats]').boundingBox();
-    expect(viewport.width - (box.x + box.width)).toBeGreaterThanOrEqual(16);
-    expect(viewport.height - (box.y + box.height)).toBeGreaterThanOrEqual(16);
-
-    // Perto do fim: não compete com "Voltar ao início" nem com o botão principal do CTA.
-    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
-    await page.waitForTimeout(SETTLE);
-    expect(await floatingState(page)).toEqual({ visible: false, focusable: false });
-  });
-}
 
 test.describe('aparelho só de toque', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });

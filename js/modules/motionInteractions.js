@@ -19,16 +19,12 @@ export function initInteractions({ env }) {
   cards(reduced, track);
   const menu = mobileMenu(reduced, track);
   const indicator = navIndicator(reduced, track);
-  const floating = floatingWhats(reduced, track);
   entradaEmSequencia('[data-diferenciais]', '[data-diferencial]', reduced, track);
-  rodape(reduced, track);
+  rodape(reduced, track, env.lowPower);
 
   return {
     setActiveSection(id) {
       indicator.setActive(id);
-    },
-    setFloatingVisible(visible) {
-      floating.setVisible(visible);
     },
     destroy() {
       menu.close();
@@ -288,51 +284,6 @@ function navIndicator(reduced, track) {
   };
 }
 
-function floatingWhats(reduced, track) {
-  const button = $('[data-floating-whats]');
-  if (!button) return { setVisible() {} };
-  const icon = $('svg', button);
-  let shown = true;
-  let initialized = false;
-
-  if (!reduced && icon) {
-    track(
-      hover(button, () => {
-        animate(icon, { rotate: -10, scale: 1.1 }, springBouncy);
-        return () => animate(icon, { rotate: 0, scale: 1 }, spring);
-      }),
-    );
-  }
-  track(
-    press(button, () => {
-      animate(button, { scale: 0.92 }, { type: 'spring', stiffness: 700, damping: 30 });
-      return () => animate(button, { scale: 1 }, springBouncy);
-    }),
-  );
-
-  return {
-    setVisible(next) {
-      if (initialized && next === shown) return;
-      const instant = !initialized || reduced;
-      initialized = true;
-      shown = next;
-      if (next) {
-        button.classList.remove('is-hidden');
-        button.removeAttribute('tabindex');
-        button.removeAttribute('aria-hidden');
-        animate(button, { opacity: 1, scale: 1, y: 0 }, instant ? { duration: 0 } : springBouncy);
-      } else {
-        // Fora do alcance do teclado enquanto o CTA do hero está na tela.
-        button.setAttribute('tabindex', '-1');
-        button.setAttribute('aria-hidden', 'true');
-        animate(button, { opacity: 0, scale: 0.6, y: 16 }, instant ? { duration: 0 } : { duration: 0.22, ease: 'easeIn' }).then(() => {
-          if (!shown) button.classList.add('is-hidden');
-        });
-      }
-    },
-  };
-}
-
 /**
  * Entrada escalonada de um grupo quando ele chega à tela.
  *
@@ -340,47 +291,48 @@ function floatingWhats(reduced, track) {
  * sai antes de tocar em qualquer estilo. O mesmo vale se este módulo falhar ao carregar — quem
  * esconde é o JavaScript, nunca o CSS, e por isso nada some sem o script para revelar de volta.
  */
-function entradaEmSequencia(seletorGrupo, seletorItem, reduced, track, { y = 18, atraso = 0.08 } = {}) {
+function entradaEmSequencia(
+  seletorGrupo,
+  seletorItem,
+  reduced,
+  track,
+  { y = 18, atraso = 0.08, duracao = 0.5, desfoque = 0, umaVez = false } = {},
+) {
   const grupo = $(seletorGrupo);
   if (!grupo || reduced) return;
   const itens = $$(seletorItem, grupo);
   if (!itens.length) return;
 
   itens.forEach(el => (el.style.opacity = '0'));
+  let feito = false;
   track(
     inView(
       grupo,
       () => {
-        animate(
-          itens,
-          { opacity: [0, 1], y: [y, 0] },
-          { duration: 0.5, ease: easeOut, delay: stagger(atraso) },
-        );
+        if (umaVez && feito) return;
+        feito = true;
+        const de = { opacity: [0, 1], y: [y, 0] };
+        // filter é caro de animar; quem pediu blur passa o valor e só entra onde vale a pena.
+        if (desfoque) de.filter = [`blur(${desfoque}px)`, 'blur(0px)'];
+        animate(itens, de, { duration: duracao, ease: easeOut, delay: stagger(atraso) });
       },
       { margin: '0px 0px -12% 0px' },
     ),
   );
 }
 
-/** Rodapé: marca, colunas e parte legal entram em sequência; o brilho respira bem devagar. */
-function rodape(reduced, track) {
+/** Rodapé: marca, colunas e parte legal entram em sequência, desfocando para nítido. */
+function rodape(reduced, track, lowPower) {
   const raiz = $('[data-rodape]');
   if (!raiz) return;
 
-  entradaEmSequencia('[data-rodape]', '[data-rodape-item]', reduced, track, { y: 22, atraso: 0.09 });
-
-  // Movimento muito lento no brilho: 22 s por ciclo, só deslocamento e opacidade, e apenas
-  // enquanto o rodapé está na tela. Nada de rotação ou de elemento flutuando sem parar à vista.
-  const brilho = $('[data-rodape-brilho]', raiz);
-  if (!brilho || reduced) return;
-  track(
-    inView(raiz, () => {
-      const loop = animate(
-        brilho,
-        { opacity: [0.75, 1, 0.75], x: ['-3%', '3%', '-3%'] },
-        { duration: 22, ease: 'easeInOut', repeat: Infinity },
-      );
-      return () => loop.stop();
-    }),
-  );
+  // Entra de cima e saindo de fora de foco, uma única vez. O desfoque é o que dá o efeito, mas
+  // custa GPU: em aparelho fraco fica só o deslocamento, que sozinho já lê bem.
+  entradaEmSequencia('[data-rodape]', '[data-rodape-item]', reduced, track, {
+    y: -8,
+    atraso: 0.1,
+    duracao: 0.8,
+    desfoque: lowPower ? 0 : 4,
+    umaVez: true,
+  });
 }

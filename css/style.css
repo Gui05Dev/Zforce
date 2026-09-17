@@ -252,6 +252,7 @@ main[id] {
   gap: 10px;
   margin-right: auto;
   text-decoration: none;
+  transition: gap 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .marca img {
   width: 36px;
@@ -265,6 +266,23 @@ main[id] {
   letter-spacing: 0.02em;
   line-height: 1;
   text-transform: uppercase;
+  /* Ao rolar, sobra só o símbolo: o nome recolhe para a esquerda e some. O max-width fica logo
+     acima da largura real ("Mobilidade elétrica" é a linha mais larga) para o recolhimento
+     começar na hora, sem trecho parado no início da transição. */
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.25s ease;
+}
+/* O nome acessível vive no aria-label do link, então esconder o texto não custa leitura. */
+.topo.is-scrolled .marca {
+  gap: 0;
+}
+.topo.is-scrolled .marca span {
+  max-width: 0;
+  opacity: 0;
 }
 .marca small {
   font-family: var(--texto);
@@ -439,25 +457,6 @@ main[id] {
   gap: 28px;
   align-items: center;
 }
-.local {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  color: var(--cinza);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-.local::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--brand-green);
-  box-shadow: 0 0 0 4px rgb(168 224 0 / 0.16);
-}
 h1 {
   font-size: clamp(2.9rem, 6.6vw, 6.1rem);
   line-height: 0.9;
@@ -467,11 +466,13 @@ mark {
   color: var(--brand-green);
   background: none;
 }
+/* Texto de apoio: explica o processo sem disputar atenção com o <h1> nem com o botão. */
 .abertura-lead {
-  max-width: 34rem;
-  margin-top: 26px;
+  max-width: 30rem;
+  margin-top: 22px;
   color: var(--cinza);
-  font-size: 1.15rem;
+  font-size: 1.02rem;
+  line-height: 1.5;
 }
 .abertura-acoes {
   display: flex;
@@ -482,6 +483,17 @@ mark {
 }
 .desenho-palco {
   position: relative;
+}
+/* Spot de luz atrás do desenho — mais dramático, tipo palco de anúncio de produto,
+   sem mexer no restante do fundo (partículas 3D e feixes continuam por baixo). */
+.desenho-palco::before {
+  content: "";
+  position: absolute;
+  inset: -18% -12%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgb(0 194 209 / 0.32), transparent 70%);
+  filter: blur(6px);
+  pointer-events: none;
 }
 .desenho {
   position: relative;
@@ -513,6 +525,11 @@ mark {
   width: 100%;
   height: auto;
   overflow: visible;
+  /* Leve rotação e sombra funda: o GSAP anima clipPath no <figure> pai (heroIntro em
+     gsapScrollAnimations.js), nunca o transform do svg, então os dois nunca disputam a mesma
+     propriedade — mesma regra de "camadas de animação" do CLAUDE.md. */
+  transform: rotate(-3deg) scale(1.05);
+  filter: drop-shadow(0 26px 32px rgb(0 0 0 / 0.5));
 }
 .traco {
   fill: none;
@@ -1311,31 +1328,38 @@ mark {
 /* Rodapé: fecha a página com o fio da marca, um brilho contido e três blocos de informação. */
 .rodape {
   position: relative;
-  isolation: isolate;
   overflow: hidden;
+  /* Painel contido e com o topo arredondado, apoiado sobre o preto do body: o rodapé deixa de
+     ser uma faixa de ponta a ponta e passa a fechar a página. */
+  width: min(1400px, 100%);
+  margin-inline: auto;
   padding-block: clamp(48px, 7vw, 84px) clamp(24px, 3vw, 36px);
+  border-top: 1px solid var(--linha);
+  border-radius: clamp(24px, 4vw, 44px) clamp(24px, 4vw, 44px) 0 0;
   background: var(--carbono);
   color: var(--cinza);
   font-size: 0.95rem;
 }
-/* Fio de 1px com o gradiente da marca, no lugar da borda cinza. */
-.rodape-fio {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: var(--brand-gradient);
-  opacity: 0.75;
+
+/* Colunas de links: duas no celular, quatro a partir do tablet — como no componente. */
+.rodape-colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 36px) 24px;
 }
-/* Brilho único e suave — sem blur pesado: é um radial-gradient, não um filtro. */
-.rodape-brilho {
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  top: -40%;
-  width: min(900px, 120%);
-  aspect-ratio: 2 / 1;
-  translate: -50% 0;
-  background: radial-gradient(closest-side, rgb(0 194 209 / 0.16), rgb(168 224 0 / 0.05) 55%, transparent 75%);
+.rodape-icone {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rodape-lista a {
+  display: inline-flex;
+  align-items: center;
 }
 
 .rodape-grade {
@@ -1395,6 +1419,26 @@ mark {
   color: var(--cinza-2);
   font-size: 0.82rem;
 }
+/* Copyright à esquerda, "Voltar ao início" na ponta oposta, crédito ocupando a linha inteira
+   embaixo. Medido: os dois primeiros somam 295px, e a partir de 370px de tela sobra folga para
+   eles lado a lado. O espaçamento acompanha a largura para não apertar no celular. */
+@media (min-width: 370px) {
+  .rodape-legal {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px clamp(16px, 4vw, 32px);
+    align-items: baseline;
+  }
+  .rodape-topo {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+    justify-self: end;
+  }
+  .rodape-creditos {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+}
 .rodape-creditos {
   color: var(--cinza-2);
   font-size: 0.78rem;
@@ -1407,33 +1451,6 @@ mark {
   text-decoration-color: var(--linha-forte);
 }
 
-/* Fora do #smooth-content; respeita a área segura (notch, barra de gestos) */
-.whats-flutuante {
-  position: fixed;
-  right: calc(clamp(16px, 2.5vw, 28px) + env(safe-area-inset-right, 0px));
-  bottom: calc(clamp(16px, 2.5vw, 28px) + env(safe-area-inset-bottom, 0px));
-  z-index: 40;
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--brand-blue);
-  box-shadow: 0 10px 30px -8px rgb(0 194 209 / 0.55);
-}
-.whats-flutuante svg {
-  width: 26px;
-  height: 26px;
-  fill: none;
-  stroke: var(--preto);
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.whats-flutuante.is-hidden {
-  visibility: hidden;
-  pointer-events: none;
-}
 
 /* Celular */
 @media (max-width: 859px) {
@@ -1500,10 +1517,6 @@ mark {
   .feixes--cta .feixe {
     top: 16%;
   }
-  .whats-flutuante {
-    width: 52px;
-    height: 52px;
-  }
 }
 
 @media (max-width: 699px) {
@@ -1538,14 +1551,16 @@ mark {
 }
 
 @media (min-width: 760px) {
-  .rodape-grade {
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(28px, 4vw, 64px);
+  .rodape-colunas {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .rodape-legal {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 8px 32px;
-    align-items: baseline;
+}
+
+@media (min-width: 1100px) {
+  .rodape-grade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+    gap: clamp(32px, 5vw, 64px);
   }
 }
 

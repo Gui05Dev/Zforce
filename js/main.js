@@ -115,15 +115,6 @@ async function boot() {
   const diagnostic = safely('Diagnóstico', () => initDiagnostic({ root: $('[data-diagnostic]'), env }), null);
   if (diagnostic) cleanups.push(() => diagnostic.destroy());
 
-  // WhatsApp flutuante: escondido sobre o hero, sobre os controles de "Resultados" e do diagnóstico,
-  // e do CTA final até o rodapé. Começa "fora" de todos: os gatilhos só avisam quando uma área está ativa.
-  const floating = { hero: false, diagnostic: false, contact: false };
-  const updateFloating = () => interactions?.setFloatingVisible(!Object.values(floating).some(Boolean));
-  const floatingArea = area => visible => {
-    floating[area] = visible;
-    updateFloating();
-  };
-
   // SplitText mede linhas: espera as fontes (com limite curto) para não quebrar errado.
   await waitForFonts();
   if (disposed) return;
@@ -137,9 +128,6 @@ async function boot() {
         hooks: {
           onHeroDrawing: () => drawing.play(),
           onSectionChange: id => interactions?.setActiveSection(id),
-          onHeroVisible: floatingArea('hero'),
-          onDiagnosticVisible: floatingArea('diagnostic'),
-          onContactVisible: floatingArea('contact'),
         },
       }),
     null,

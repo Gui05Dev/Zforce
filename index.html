@@ -63,16 +63,10 @@
         <a href="#contato">Contato</a>
         <span class="menu-indicador" aria-hidden="true" data-menu-indicator></span>
       </nav>
-
-      <div class="topo-contato">
-        <a class="topo-telefone" href="tel:+5545988037791">(45) 98803-7791</a>
-        <a class="botao botao--pequeno" href="https://wa.me/5545988037791?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Z-Force%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener noreferrer">WhatsApp</a>
-      </div>
-    </div>
   </header>
 
-  <!-- ScrollSmoother: só o conteúdo rolável fica aqui dentro. Topo fixo e WhatsApp flutuante
-       ficam fora, sem sofrer transform. -->
+  <!-- ScrollSmoother: só o conteúdo rolável fica aqui dentro. O topo fixo fica fora,
+       sem sofrer transform. -->
   <div id="smooth-wrapper">
   <div id="smooth-content">
   <main id="conteudo" tabindex="-1">
@@ -90,16 +84,14 @@
 
       <div class="shell abertura-grade" data-hero-content>
         <div class="abertura-texto">
-          <p class="local js-hero" data-hero-item>Cafelândia, Paraná</p>
           <h1 class="js-hero" data-hero-title>Conserto de patinete, scooter e <mark>bike elétrica</mark>.</h1>
-          <p class="abertura-lead js-hero" data-hero-item>Mande uma foto ou um vídeo do problema pelo WhatsApp. A gente avalia, passa o orçamento e só mexe no veículo depois que você aprovar. Se precisar, buscamos e entregamos.</p>
-          <div class="abertura-acoes js-hero" data-hero-item>
+          <p class="abertura-lead js-hero" data-hero-item="lead">Mande uma foto do problema pelo WhatsApp. A gente avalia, passa o orçamento e só mexe depois que você aprovar.</p>
+          <div class="abertura-acoes js-hero" data-hero-item="acoes">
             <a class="botao botao--grande" href="https://wa.me/5545988037791?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Z-Force%20e%20gostaria%20de%20avaliar%20meu%20ve%C3%ADculo." target="_blank" rel="noopener noreferrer">
               <svg class="botao-icone" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3a12 12 0 0 0-10.3 18.2L4 28l7-1.8A12 12 0 1 0 16 3Z"/></svg>
               Chamar no WhatsApp
               <svg class="botao-seta" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
             </a>
-            <a class="link-texto" href="tel:+5545988037791">ou ligue (45) 98803-7791</a>
           </div>
         </div>
 
@@ -150,11 +142,6 @@
       </div>
 
       <div class="shell abertura-base">
-        <ul class="faixa js-hero" data-hero-strip>
-          <li>Patinetes, scooters e bicicletas elétricas</li>
-          <li>Orçamento antes do serviço</li>
-          <li>Retirada e entrega a combinar</li>
-        </ul>
       </div>
     </section>
 
@@ -280,39 +267,6 @@
           </div>
         </div>
 
-        <!-- Números tirados do próprio conteúdo do site (sem estatísticas inventadas). -->
-        <!-- Diferenciais reais do atendimento. Nada aqui é estatística: são compromissos que o
-             próprio site já descreve, então não há número inventado para sustentar. -->
-        <ul class="diferenciais" aria-label="Como a Z-Force trabalha" data-diferenciais>
-          <li class="diferencial" data-diferencial>
-            <span class="diferencial-icone" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21"/><path d="M8.6 11h1.8l1 2 1.4-3.6 1 1.6h1.6"/></svg>
-            </span>
-            <h3>Diagnóstico especializado</h3>
-            <p>Avaliação técnica voltada para patinetes, scooters e bicicletas elétricas.</p>
-          </li>
-          <li class="diferencial" data-diferencial>
-            <span class="diferencial-icone" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14.5 3v4.5H19"/><path d="M9 12h6M9 15.5h6M9 8.5h2.5"/></svg>
-            </span>
-            <h3>Orçamento transparente</h3>
-            <p>Você recebe a explicação do problema e do serviço antes de decidir.</p>
-          </li>
-          <li class="diferencial" data-diferencial>
-            <span class="diferencial-icone" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 2.8 4.5 6v6c0 4.4 3.1 7.9 7.5 9.2 4.4-1.3 7.5-4.8 7.5-9.2V6Z"/><path d="M8.8 11.9 11 14.2l4.2-4.4"/></svg>
-            </span>
-            <h3>Reparo autorizado</h3>
-            <p>Nenhum conserto começa sem a aprovação do cliente.</p>
-          </li>
-          <li class="diferencial" data-diferencial>
-            <span class="diferencial-icone" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M2.8 7.5h9.4v8.2H2.8z"/><path d="M12.2 10.3h4l3 3v2.4h-7z"/><circle cx="6.6" cy="17.6" r="1.9"/><circle cx="16.4" cy="17.6" r="1.9"/></svg>
-            </span>
-            <h3>Retirada e entrega</h3>
-            <p>Agendamento a combinar em Cafelândia e região.</p>
-          </li>
-        </ul>
       </div>
     </section>
 
@@ -344,11 +298,6 @@
   </main>
 
   <footer class="rodape" data-rodape>
-    <!-- Fio de gradiente no topo e um brilho contido ao fundo: o rodapé fecha a página
-         em vez de ser só uma linha de créditos. -->
-    <span class="rodape-fio" aria-hidden="true"></span>
-    <span class="rodape-brilho" aria-hidden="true" data-rodape-brilho></span>
-
     <div class="shell rodape-grade">
       <div class="rodape-marca" data-rodape-item>
         <a class="marca marca--rodape" href="#inicio" aria-label="Z-Force, início">
@@ -356,39 +305,65 @@
           <span>Z-Force <small>Mobilidade elétrica</small></span>
         </a>
         <p class="rodape-sobre">Assistência de mobilidade elétrica em Cafelândia, no Paraná. Patinetes, scooters e bicicletas elétricas — do pneu furado ao problema elétrico.</p>
-        <a class="botao botao--pequeno" href="https://wa.me/5545988037791?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Z-Force%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener noreferrer">
-          <svg class="botao-icone" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3a12 12 0 0 0-10.3 18.2L4 28l7-1.8A12 12 0 1 0 16 3Z"/></svg>
-          Pedir orçamento
-        </a>
       </div>
 
-      <div class="rodape-coluna" data-rodape-item>
-        <h2 class="rodape-titulo">Contato</h2>
-        <ul class="rodape-lista">
-          <li><a href="https://wa.me/5545988037791?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Z-Force%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener noreferrer">WhatsApp (45) 98803-7791</a></li>
-          <li><a href="https://www.instagram.com/zforce_scooter/" target="_blank" rel="noopener noreferrer">@zforce_scooter</a></li>
-        </ul>
-      </div>
+      <div class="rodape-colunas">
+        <div class="rodape-coluna" data-rodape-item>
+          <h2 class="rodape-titulo">Navegação</h2>
+          <ul class="rodape-lista">
+            <li><a href="#servicos">Serviços</a></li>
+            <li><a href="#como-funciona">Diagnóstico</a></li>
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#contato">Contato</a></li>
+          </ul>
+        </div>
 
-      <div class="rodape-coluna" data-rodape-item>
-        <h2 class="rodape-titulo">Onde</h2>
-        <ul class="rodape-lista">
-          <li>Cafelândia, PR</li>
-          <li>Retirada e entrega a combinar</li>
-        </ul>
+        <div class="rodape-coluna" data-rodape-item>
+          <h2 class="rodape-titulo">Atendimento</h2>
+          <ul class="rodape-lista">
+            <li>
+              <a href="https://wa.me/5545988037791?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Z-Force%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener noreferrer">
+                <svg class="rodape-icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.4A10 10 0 1 0 12 2Z"/><path d="M9 8c.4-.2.8-.1 1 .2l1 2.2c.1.3 0 .6-.2.8l-.7.7a8 8 0 0 0 3.5 3.5l.7-.7c.2-.2.5-.3.8-.2l2.2 1c.3.2.4.6.2 1a3 3 0 0 1-2.7 1.5A9.5 9.5 0 0 1 7.5 10.7 3 3 0 0 1 9 8Z"/></svg>
+                (45) 98803-7791
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="rodape-coluna" data-rodape-item>
+          <h2 class="rodape-titulo">Onde</h2>
+          <ul class="rodape-lista">
+            <li>Cafelândia, PR</li>
+            <li>Retirada e entrega a combinar</li>
+          </ul>
+        </div>
+
+        <div class="rodape-coluna" data-rodape-item>
+          <h2 class="rodape-titulo">Redes</h2>
+          <ul class="rodape-lista">
+            <li>
+              <a href="https://www.instagram.com/zforce_scooter/" target="_blank" rel="noopener noreferrer">
+                <svg class="rodape-icone" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2"/></svg>
+                @zforce_scooter
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="shell rodape-legal" data-rodape-item>
       <span>© <span data-year>2026</span> Z-Force Mobilidade Elétrica</span>
+      <a class="rodape-topo" href="#inicio">Voltar ao início ↑</a>
+      <!-- Crédito exigido pela licença CC BY 4.0 do modelo 3D.
+           Texto da licença: public/assets/models/xiaomi-scooter/license.txt (publicado junto com o site);
+           arquivos originais do modelo: assets-src/models/xiaomi-scooter/. -->
+      <small class="rodape-creditos">Modelo 3D <a href="https://sketchfab.com/3d-models/2022-xiaomi-mi-scooter-582845e3d7b24d7a971fbb2bcd0cac0b" target="_blank" rel="noopener noreferrer">“2022 Xiaomi Mi Scooter”</a>, de <a href="https://sketchfab.com/tonielpro520" target="_blank" rel="noopener noreferrer">tonielpro520</a> (Sketchfab), <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> — adaptado. Sem vínculo com a Xiaomi.</small>
     </div>
   </footer>
   </div>
   </div>
 
-  <a class="whats-flutuante" href="https://wa.me/5545988037791?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Z-Force%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener noreferrer" aria-label="Abrir conversa com a Z-Force no WhatsApp" data-floating-whats>
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3a12 12 0 0 0-10.3 18.2L4 28l7-1.8A12 12 0 1 0 16 3Z"/><path d="M12 10c.5-.3 1-.2 1.2.3l1.4 3c.2.4.1.8-.2 1.1l-1 1c1 2.1 2.7 3.8 4.8 4.8l1-1c.3-.3.7-.4 1.1-.2l3 1.4c.5.2.6.7.3 1.2-.7 1.3-2 2.1-3.5 2-6.2-.4-11.3-5.5-11.7-11.7-.1-1.5.7-2.8 2-3.5Z"/></svg>
-  </a>
 
   <script type="module" src="js/main.js"></script>
 </body>

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { contrastRatio, hiddenElements, scrollThrough, scrollToElement, watchConsole } from './helpers.js';
+import { contrastRatio, hiddenElements, scrollThrough, watchConsole } from './helpers.js';
 
 const VIEWPORTS = [
   { width: 390, height: 844 },
@@ -51,8 +51,10 @@ test('ordem das seções, sem rótulo repetindo o menu nem numeração', async (
 test('links de contato preservados', async ({ page }) => {
   await page.goto('/');
   // Os dados de contato deixaram de ser repetidos no CTA e no rodapé: agora só no rodapé.
-  await expect(page.locator('a[href^="https://wa.me/5545988037791?text="]')).toHaveCount(20);
-  await expect(page.locator('a[href="tel:+5545988037791"]')).toHaveCount(3);
+  // 12 no index.html + 5 gerados na seção de diagnóstico (um CTA por componente).
+  await expect(page.locator('a[href^="https://wa.me/5545988037791?text="]')).toHaveCount(17);
+  // O telefone saiu do topo e do hero: o contato passou a ser só por WhatsApp.
+  await expect(page.locator('a[href="tel:+5545988037791"]')).toHaveCount(0);
   await expect(page.locator('a[href="https://www.instagram.com/zforce_scooter/"]')).toHaveCount(2);
   await expect(page.locator('.problemas a')).toHaveCount(9);
   // Crédito exigido pela licença CC BY 4.0 do modelo 3D
@@ -111,27 +113,15 @@ test('menu desktop sem estouro entre 860px e 1180px', async ({ page }) => {
   }
 });
 
-test('diferenciais: quatro blocos, sem número inventado, revelados ao chegar na tela', async ({ page }) => {
+test('nenhuma estatística inventada em toda a página', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.waitForTimeout(1200);
-  await scrollToElement(page, '[data-diferenciais]', 0.4);
-  await page.waitForTimeout(1800);
-
-  const itens = page.locator('[data-diferencial]');
-  await expect(itens).toHaveCount(4);
-  await expect(itens.locator('h3')).toHaveText([
-    'Diagnóstico especializado',
-    'Orçamento transparente',
-    'Reparo autorizado',
-    'Retirada e entrega',
-  ]);
-  // A entrada é do Motion: ao fim, todos visíveis.
-  for (const item of await itens.all()) {
-    expect(await item.evaluate(el => Number(getComputedStyle(el).opacity))).toBeGreaterThan(0.95);
-  }
-  // Nenhuma estatística: a seção não pode voltar a exibir números grandes.
+  await scrollThrough(page, 'down');
+  // O bloco de diferenciais foi removido do site. O compromisso que continua valendo é este:
+  // nenhum número grande de vitrine, porque não há dado real para sustentar.
   await expect(page.locator('[data-count], .numero-valor')).toHaveCount(0);
+  await expect(page.locator('[data-diferencial]')).toHaveCount(0);
 });
 
 test('contraste dos textos secundários', async ({ page }) => {
@@ -145,7 +135,6 @@ test('contraste dos textos secundários', async ({ page }) => {
     '.diagnostico-sintoma',
     '.diagnostico-aviso',
     '.etapa p:last-child',
-    '.diferencial p',
   ];
   for (const selector of selectors) {
     expect(await contrastRatio(page, selector), selector).toBeGreaterThanOrEqual(6);
@@ -158,8 +147,8 @@ test('teclado: skip link primeiro e foco visível', async ({ page }) => {
   await page.keyboard.press('Tab');
   await expect(page.locator('.skip-link')).toBeFocused();
   // Tab real a partir do hero, ainda durante a entrada: nada animado pode sair da ordem de foco.
-  await page.locator('.link-texto').first().focus();
-  await expect(page.locator('.link-texto').first()).toBeFocused();
+  await page.locator('[data-hero] .botao').first().focus();
+  await expect(page.locator('[data-hero] .botao').first()).toBeFocused();
   const link = page.locator('.problemas a').first();
   for (let i = 0; i < 3 && !(await link.evaluate(el => el === document.activeElement)); i++) {
     await page.keyboard.press('Tab');
@@ -188,7 +177,6 @@ test.describe('prefers-reduced-motion', () => {
     await expect(page.locator('html')).not.toHaveClass(/has-smoother/);
     expect(await hiddenElements(page)).toEqual([]);
     await expect(page.locator('[data-hero-canvas] canvas')).toHaveCount(0);
-    await expect(page.locator('[data-diferencial]')).toHaveCount(4);
     const transform = await page.locator('#smooth-content').evaluate(el => getComputedStyle(el).transform);
     expect(transform).toBe('none');
     expect(problems).toEqual([]);
@@ -205,6 +193,7 @@ test.describe('JavaScript desativado', () => {
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('#menu a').first()).toBeVisible();
     await expect(page.locator('.problemas a').first()).toBeVisible();
-    await expect(page.locator('[data-diferencial]').last()).toContainText('Retirada e entrega');
+    await expect(page.locator('#sobre h2')).toContainText('Sobre a Z-Force');
+    await expect(page.locator('.rodape-creditos')).toContainText('tonielpro520');
   });
 });
