@@ -162,12 +162,14 @@ test('selecionado não depende só da cor: nome visível ao lado do ponto', asyn
   expect(await other.evaluate(el => Number(getComputedStyle(el).opacity))).toBeLessThan(0.1);
 });
 
-test('etapas: faixa horizontal no desktop', async ({ page }) => {
+test('etapas: lista vertical, ordem correta e linha de progresso', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  const tops = await page.locator('.etapa').evaluateAll(els => els.map(el => Math.round(el.getBoundingClientRect().top)));
-  expect(new Set(tops).size).toBe(1);
-  await expect(page.locator('.etapa h3')).toHaveText(['Primeiro, a conversa', 'Depois, a avaliação', 'Orçamento antes do serviço', 'Pronto para rodar']);
+  // Lista vertical em qualquer largura: mesma coluna (left igual), topo crescente.
+  const boxes = await page.locator('.passo').evaluateAll(els => els.map(el => el.getBoundingClientRect()));
+  expect(new Set(boxes.map(b => Math.round(b.left))).size).toBe(1);
+  expect(boxes.map(b => Math.round(b.top))).toEqual([...boxes.map(b => Math.round(b.top))].sort((a, b) => a - b));
+  await expect(page.locator('.passo h3')).toHaveText(['Primeiro, a conversa', 'Depois, a avaliação', 'Orçamento antes do serviço', 'Pronto para rodar']);
 });
 
 for (const viewport of [
@@ -221,7 +223,7 @@ test.describe('celular 390×844 com toque', () => {
     expect(await hotspotsInsideStage(page)).toEqual([]);
     await page.locator('[data-hotspot="painel"] button').tap();
     await expect(card(page, 'painel')).toBeVisible();
-    const lefts = await page.locator('.etapa').evaluateAll(els => els.map(el => Math.round(el.getBoundingClientRect().left)));
+    const lefts = await page.locator('.passo').evaluateAll(els => els.map(el => Math.round(el.getBoundingClientRect().left)));
     expect(new Set(lefts).size).toBe(1);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
     await page.locator('.diagnostico').screenshot({ path: 'test-results/shots/diagnostico-390.png' });
@@ -250,6 +252,6 @@ test.describe('JavaScript desativado', () => {
     for (const c of await page.locator('.diagnostico-card').all()) await expect(c).toBeVisible();
     await expect(page.locator('.diagnostico-cta').first()).toHaveAttribute('href', /wa\.me\/5545988037791\?text=/);
     await expect(page.locator('.diagnostico-pontos')).toBeHidden();
-    await expect(page.locator('.etapa')).toHaveCount(4);
+    await expect(page.locator('.passo')).toHaveCount(4);
   });
 });

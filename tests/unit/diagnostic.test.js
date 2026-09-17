@@ -67,7 +67,7 @@ test('HTML gerado: botões acessíveis, cards, sintomas, CTA, aviso e quatro eta
   assert.match(html, /Arraste para girar/);
   assert.match(html, /Modelo meramente ilustrativo\./);
   assert.match(html, /id="diagnostico-descricao"/);
-  assert.equal((html.match(/class="etapa"/g) || []).length, STEPS.length);
+  assert.equal((html.match(/class="passo"/g) || []).length, STEPS.length);
   // O rótulo curto de cada etapa saiu: repetia o próprio título em três das quatro.
   assert.deepEqual(STEPS.map(s => s.titulo), [
     'Primeiro, a conversa',

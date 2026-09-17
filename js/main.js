@@ -4,7 +4,7 @@ import { getSceneConfig, readEnvironment } from './modules/env.js';
 import { initSmoothScroll } from './modules/smoothScroll.js';
 import { initScrollAnimations } from './modules/gsapScrollAnimations.js';
 import { initInteractions } from './modules/motionInteractions.js';
-import { createHeroDrawing } from './modules/animeCounters.js';
+import { createHeroDrawing, createStepsIndicators } from './modules/animeCounters.js';
 import { initDiagnostic } from './modules/interactiveDiagnostic.js';
 
 const root = document.documentElement;
@@ -107,6 +107,11 @@ async function boot() {
     handOff() {},
     restore() {},
   });
+  const steps = safely(
+    'Anime (etapas)',
+    () => createStepsIndicators($('[data-steps]'), env),
+    { setProgress() {}, setActive() {} },
+  );
   if (interactions) cleanups.push(() => interactions.destroy());
   performance.mark('zf:motion-anime');
 
@@ -128,6 +133,8 @@ async function boot() {
         hooks: {
           onHeroDrawing: () => drawing.play(),
           onSectionChange: id => interactions?.setActiveSection(id),
+          onStepsProgress: progress => steps.setProgress(progress),
+          onStepActive: (index, active) => steps.setActive(index, active),
         },
       }),
     null,

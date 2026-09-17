@@ -1187,26 +1187,119 @@ mark {
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
-.etapas {
+/* "Como funciona o atendimento": lista vertical com linha de progresso e anéis que acendem
+   à medida que cada etapa entra na tela (GSAP decide quando via ScrollTrigger, o Anime.js decide
+   como — desenha o anél e a linha, mesma divisão de território do resto do site). */
+.passos-area {
+  position: relative;
+}
+.passos-linha {
+  position: absolute;
+  top: 28px;
+  bottom: 28px;
+  left: 26px;
+  width: 4px;
+  height: calc(100% - 56px);
+  overflow: visible;
+}
+.passos-linha path {
+  fill: none;
+  stroke-width: 2;
+}
+.passos-linha-base {
+  stroke: var(--linha-forte);
+}
+.passos-linha-progresso {
+  stroke: var(--brand-blue);
+}
+.passos {
+  position: relative;
   display: grid;
+  gap: clamp(28px, 5vw, 44px);
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.etapa {
+.passo {
   display: grid;
-  gap: 6px;
-  align-content: start;
-  padding-top: 16px;
-  border-top: 1px solid var(--linha);
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
 }
-.etapa h3 {
-  font-size: 1.25rem;
+.passo-indicador {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  /* Contorno por sombra: sem borda, o anel absoluto do Anime.js fica exatamente concêntrico */
+  box-shadow: inset 0 0 0 1px var(--linha-forte);
+  background: var(--carbono-2);
+  color: var(--cinza);
+  transition: color 0.3s ease;
+}
+.passo-anel {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 64px;
+  height: 64px;
+  transform: rotate(-90deg);
+}
+.passo-anel circle {
+  fill: none;
+  stroke: var(--brand-blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.passo-icone {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.passo.is-active .passo-indicador {
+  color: var(--brand-blue);
+}
+/* Etapa inativa continua legível (só um degrau abaixo); a ativa ganha branco e ciano.
+   A troca é por cor, não por opacidade: o GSAP já controla a opacidade da revelação inicial. */
+.passo-numero {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--cinza-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  transition: color 0.45s ease;
 }
-.etapa p:last-child {
+.passo h3 {
+  color: var(--cinza);
+  font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+  text-transform: uppercase;
+  transition: color 0.45s ease;
+}
+.passo p {
+  margin-top: 6px;
   color: var(--cinza);
   font-size: 0.95rem;
+  transition: color 0.45s ease;
+}
+.passo.is-active .passo-numero,
+.no-js .passo-numero {
+  color: var(--brand-blue);
+}
+.passo.is-active h3,
+.no-js .passo h3 {
+  color: var(--branco);
+}
+.passo.is-active p,
+.no-js .passo p {
+  color: var(--cinza);
 }
 
 /* Sobre e números */
@@ -1609,14 +1702,6 @@ mark {
   .duas-colunas {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
     gap: 64px;
-  }
-  /* Etapas lado a lado: a ordem da sequência fica na leitura, da esquerda para a direita */
-  .etapas {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 24px;
-  }
-  .etapa {
-    padding-top: 18px;
   }
 }
 

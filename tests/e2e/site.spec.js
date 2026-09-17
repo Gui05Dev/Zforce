@@ -134,7 +134,7 @@ test('contraste dos textos secundários', async ({ page }) => {
     '.diagnostico-card-resumo',
     '.diagnostico-sintoma',
     '.diagnostico-aviso',
-    '.etapa p:last-child',
+    '.passo p',
   ];
   for (const selector of selectors) {
     expect(await contrastRatio(page, selector), selector).toBeGreaterThanOrEqual(6);

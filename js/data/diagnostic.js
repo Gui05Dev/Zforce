@@ -86,11 +86,29 @@ export const COMPONENTS = [
   },
 ];
 
+// `icone`: path interno do svg (viewBox 0 0 24 24, mesmo estilo de traço dos outros ícones do
+// site — fill none / stroke currentColor). Usado no anel animado de "Como funciona o atendimento".
 export const STEPS = [
-  { titulo: 'Primeiro, a conversa', texto: 'O cliente envia uma mensagem com foto ou vídeo.' },
-  { titulo: 'Depois, a avaliação', texto: 'A Z-Force verifica o veículo e identifica o problema.' },
-  { titulo: 'Orçamento antes do serviço', texto: 'O cliente recebe o valor e decide se deseja aprovar.' },
-  { titulo: 'Pronto para rodar', texto: 'Após o serviço, o veículo é retirado ou entregue conforme combinado.' },
+  {
+    titulo: 'Primeiro, a conversa',
+    texto: 'O cliente envia uma mensagem com foto ou vídeo.',
+    icone: '<path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l.9-4.2A8 8 0 1 1 20 12Z"/><path d="M8.5 11h7M8.5 14h4"/>',
+  },
+  {
+    titulo: 'Depois, a avaliação',
+    texto: 'A Z-Force verifica o veículo e identifica o problema.',
+    icone: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/><path d="M7 10.5h1.7l1-2 1.6 4 1-2H14"/>',
+  },
+  {
+    titulo: 'Orçamento antes do serviço',
+    texto: 'O cliente recebe o valor e decide se deseja aprovar.',
+    icone: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="m9 14 2 2 4-4"/>',
+  },
+  {
+    titulo: 'Pronto para rodar',
+    texto: 'Após o serviço, o veículo é retirado ou entregue conforme combinado.',
+    icone: '<circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M8 17.5h8M16 17.5 13.2 5M11 5h4.5"/>',
+  },
 ];
 
 /** Mensagem do WhatsApp para um componente e (opcionalmente) um sintoma. */
@@ -165,11 +183,18 @@ export function renderDiagnostic() {
   ).join('');
 
   const steps = STEPS.map(
-    s => `
-        <li class="etapa" data-reveal-block>
-          <h3>${e(s.titulo)}</h3>
-          <p>${e(s.texto)}</p>
-        </li>`,
+    (s, i) => `
+            <li class="passo" data-step>
+              <span class="passo-indicador" aria-hidden="true" data-step-node>
+                <svg class="passo-anel" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" data-step-ring/></svg>
+                <svg class="passo-icone" viewBox="0 0 24 24">${s.icone}</svg>
+              </span>
+              <div class="passo-conteudo" data-step-content>
+                <span class="passo-numero">Etapa ${i + 1}</span>
+                <h3>${e(s.titulo)}</h3>
+                <p>${e(s.texto)}</p>
+              </div>
+            </li>`,
   ).join('');
 
   return `
@@ -201,7 +226,13 @@ export function renderDiagnostic() {
 
       <div class="etapas-bloco">
         <h3 class="etapas-titulo">Como funciona o atendimento</h3>
-        <ol class="etapas">${steps}
-        </ol>
+        <div class="passos-area" data-steps>
+          <svg class="passos-linha" viewBox="0 0 4 1000" preserveAspectRatio="none" aria-hidden="true">
+            <path class="passos-linha-base" d="M2 0V1000"/>
+            <path class="passos-linha-progresso" d="M2 0V1000" data-steps-line/>
+          </svg>
+          <ol class="passos">${steps}
+          </ol>
+        </div>
       </div>`;
 }

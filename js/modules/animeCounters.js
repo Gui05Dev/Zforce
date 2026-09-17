@@ -49,6 +49,42 @@ export function createHeroDrawing(svg, { reducedMotion }) {
   };
 }
 
+/** Linha e anéis de "Como funciona o atendimento", sincronizados com a rolagem pelo GSAP. */
+export function createStepsIndicators(root, { reducedMotion }) {
+  const inert = { setProgress() {}, setActive() {} };
+  if (!root) return inert;
+  const line = root.querySelector('[data-steps-line]');
+  const nodes = [...root.querySelectorAll('[data-step-node]')];
+  const rings = createDrawable(root.querySelectorAll('[data-step-ring]'));
+  const [lineDrawable] = line ? createDrawable(line) : [];
+
+  if (reducedMotion) {
+    // Estado final estático: linha completa e anéis visíveis, sem depender do scroll.
+    if (lineDrawable) utils.set(lineDrawable, { draw: '0 1' });
+    utils.set(rings, { draw: '0 1' });
+    return inert;
+  }
+
+  utils.set(rings, { draw: '0 0' });
+  const lineAnimation = lineDrawable
+    ? animate(lineDrawable, { draw: ['0 0', '0 1'], duration: 1000, ease: 'linear', autoplay: false })
+    : null;
+
+  return {
+    setProgress(progress) {
+      lineAnimation?.seek(progress * lineAnimation.duration, true);
+    },
+    setActive(index, active) {
+      const ring = rings[index];
+      if (!ring) return;
+      animate(ring, { draw: active ? '0 1' : '0 0', duration: active ? 900 : 380, ease: 'inOutQuad' });
+      if (active && nodes[index]) {
+        animate(nodes[index], { scale: [1, 1.14, 1], duration: 700, ease: 'outQuad' });
+      }
+    },
+  };
+}
+
 /** Contadores: sobem uma única vez até o valor escrito no HTML. */
 export function createCounters(root, { reducedMotion }) {
   if (!root) return silent;

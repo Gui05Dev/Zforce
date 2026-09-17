@@ -17,7 +17,7 @@ const noop = () => {};
  * @param {object} options.hooks callbacks para os outros módulos
  */
 export function initScrollAnimations({ env, hooks = {} }) {
-  const { onHeroDrawing = noop, onSectionChange = noop } = hooks;
+  const { onHeroDrawing = noop, onSectionChange = noop, onStepsProgress = noop, onStepActive = noop } = hooks;
   const animate = !env.reducedMotion;
   const mobile = env.mobile;
   // A trava do index.html remove .anim quando este bundle demora mais de 1,2 s: o hero já foi
@@ -39,6 +39,73 @@ export function initScrollAnimations({ env, hooks = {} }) {
         onToggle: self => self.isActive && onSectionChange(section.id),
       });
     });
+
+    // "Como funciona o atendimento": em telas largas e com movimento permitido, a seção
+    // prende na tela (pin) enquanto a pessoa rola — só solta quando o "circuito" (linha +
+    // anéis) completa, ou reverte se ela voltar. Em mobile / "reduzir movimento", cai para o
+    // acompanhamento simples por rolagem natural, sem prender a página.
+    const stepsArea = $('[data-steps]');
+    if (stepsArea) {
+      const steps = $$('[data-step]', stepsArea);
+      const total = steps.length;
+
+      const setActiveUpTo = activeIndex => {
+        steps.forEach((step, index) => {
+          const isActive = index <= activeIndex;
+          if (step.classList.contains('is-active') !== isActive) {
+            step.classList.toggle('is-active', isActive);
+            onStepActive(index, isActive);
+          }
+        });
+      };
+
+      if (animate && !mobile && total) {
+        ScrollTrigger.create({
+          trigger: stepsArea,
+          // Prende perto do topo, mas não colada nele: sobra uma tira da seção anterior
+          // visível no alto da tela enquanto a rolagem trava — não é uma tela cheia isolada
+          // só com as etapas. Duração curta de propósito, só o necessário pro circuito acender.
+          start: 'top 18%',
+          end: () => `+=${window.innerHeight * 1.15}`,
+          pin: true,
+          // Sem isso, o pin usa "position: fixed" — que quebra dentro do ScrollSmoother, porque
+          // o #smooth-content é movido via transform (o "fixed" passa a ser relativo a ele, não
+          // à janela, e o bloco preso encolhe pro canto). "transform" faz o pin se mover junto
+          // com o wrapper suavizado, do jeito certo.
+          pinType: 'transform',
+          pinSpacing: true,
+          scrub: 0.4,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: self => {
+            onStepsProgress(self.progress);
+            setActiveUpTo(self.progress <= 0 ? -1 : Math.min(total - 1, Math.floor(self.progress * total)));
+          },
+        });
+      } else {
+        ScrollTrigger.create({
+          trigger: stepsArea,
+          start: 'top 62%',
+          end: 'bottom 62%',
+          onUpdate: self => onStepsProgress(self.progress),
+          onRefresh: self => onStepsProgress(self.progress),
+        });
+        steps.forEach((step, index) => {
+          ScrollTrigger.create({
+            trigger: step,
+            start: 'top 62%',
+            onEnter: () => {
+              step.classList.add('is-active');
+              onStepActive(index, true);
+            },
+            onLeaveBack: () => {
+              step.classList.remove('is-active');
+              onStepActive(index, false);
+            },
+          });
+        });
+      }
+    }
   });
 
   let intro = null;
@@ -136,6 +203,19 @@ function scrollReveals({ mobile, lowPower }) {
   // interno pertence a outras camadas (Three.js nos hotspots, Motion no card).
   batchReveal('[data-reveal-block]', { y: mobile ? 24 : 44, stagger: 0.08, start: 'top 94%', duration: 0.95 });
 
+  // Conteúdo de cada etapa de "Como funciona": entra uma vez, na sua própria vez (sem stagger em
+  // lote) — o anel e a linha (Anime.js) que sincronizam com o scroll ficam por conta do onStepActive.
+  $$('[data-step-content]').forEach(content => {
+    gsap.from(content, {
+      opacity: 0,
+      x: mobile ? 0 : 28,
+      y: mobile ? 16 : 0,
+      duration: 0.85,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: content, start: 'top 92%', once: true },
+    });
+  });
+
   ctaReveal({ mobile });
 
   // Feixes: gradientes estáticos deslizando por transform, pausados fora da tela.
@@ -172,17 +252,28 @@ function ctaReveal({ mobile }) {
 
   const tl = gsap.timeline({
     defaults: { ease: 'expo.out', duration: 1.1 },
-    scrollTrigger: { trigger: panel, start: 'top 80%', once: true },
+    scrollTrigger: { trigger: panel, start: 'top 85%', once: true },
     onComplete: () => split?.revert(),
   });
+  // Painel visivelmente menor e recuado por dentro, crescendo (clip + escala) até o tamanho
+  // real da seção — mais "expandir" do que o mascaramento sutil anterior.
   tl.fromTo(
     panel,
-    { clipPath: mobile ? 'inset(4% 0% 4% 0% round 24px)' : 'inset(10% 7% 10% 7% round 32px)' },
-    { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1.4, ease: 'power3.inOut', clearProps: 'clipPath' },
+    {
+      clipPath: mobile ? 'inset(18% 4% 18% 4% round 28px)' : 'inset(26% 16% 26% 16% round 40px)',
+      scale: mobile ? 0.94 : 0.9,
+    },
+    {
+      clipPath: 'inset(0% 0% 0% 0% round 0px)',
+      scale: 1,
+      duration: 1.5,
+      ease: 'power3.inOut',
+      clearProps: 'clipPath,scale,transform',
+    },
     0,
   );
-  if (split) tl.from(split.lines, { yPercent: 108, stagger: 0.08, duration: 1.2 }, 0.35);
-  if (items.length) tl.from(items, { opacity: 0, y: 28, stagger: 0.1 }, 0.5);
+  if (split) tl.from(split.lines, { yPercent: 108, stagger: 0.08, duration: 1.2 }, 0.4);
+  if (items.length) tl.from(items, { opacity: 0, y: 28, stagger: 0.1 }, 0.55);
 }
 
 function beamLoops({ mobile }) {
