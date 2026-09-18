@@ -651,54 +651,71 @@ mark {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: clamp(22px, 3vw, 34px);
+  padding: clamp(28px, 3.4vw, 40px) clamp(22px, 3vw, 34px);
   border: 1px solid var(--linha);
   border-radius: var(--raio);
-  background: linear-gradient(180deg, var(--carbono-2), var(--carbono));
+  background: linear-gradient(145deg, #010101 0%, #0b0b0d 52%, #010101 100%);
   overflow: hidden;
+  transition: border-color 0.3s ease;
 }
-/* Brilho que segue o cursor: gradiente fixo, só a opacidade anima */
-.servico-brilho {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 0%), rgb(0 194 209 / 0.12), transparent 65%);
-  opacity: 0;
-  pointer-events: none;
-}
-.servico-brilho::before {
+/* Clarão frio preso ao canto inferior esquerdo: um gradiente parado, não um filtro. */
+.servico-card::before {
   content: "";
   position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgb(92 225 236 / 0.85), transparent 70%);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box exclude,
-    linear-gradient(#000 0 0);
+  z-index: -1;
+  left: -22%;
+  bottom: -28%;
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 194 209 / 0.16), transparent 72%);
+  pointer-events: none;
 }
-.no-js .servico-card:focus-within .servico-brilho {
-  opacity: 1;
-}
+
+/* Cabeçalho centralizado; a lista de problemas segue à esquerda, que é onde se lê e se toca. */
 .servico-topo {
   display: flex;
-  align-items: flex-start;
-  margin-bottom: 28px;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+.servico-card h3,
+.servico-resumo {
+  text-align: center;
 }
 .servico-icone {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
+  width: 78px;
+  height: 78px;
   border: 1px solid rgb(0 194 209 / 0.35);
-  border-radius: var(--raio-pequeno);
-  background: var(--brand-fundo);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 194 209 / 0.14), rgb(1 1 1 / 0.9));
   color: var(--brand-blue);
+}
+/* O único movimento contínuo da seção: um anel que se abre devagar a partir do ícone.
+   Oito loops por cartão (o original tinha ping, bounce e pulse somados) transformariam a
+   seção em ruído e pesariam na bateria de quem está no celular. */
+.servico-icone::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--brand-blue);
+  border-radius: 50%;
+  opacity: 0;
+  animation: servico-anel 3.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes servico-anel {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
 }
 .servico-icone svg {
   width: 26px;
@@ -721,6 +738,14 @@ mark {
   list-style: none;
   margin: 26px 0 0;
   padding: 0;
+}
+.problemas::before {
+  content: "";
+  display: block;
+  width: 38%;
+  height: 1px;
+  margin: 0 auto 20px;
+  background: linear-gradient(90deg, transparent, rgb(0 194 209 / 0.55), transparent);
 }
 .problemas a {
   position: relative;
@@ -1732,6 +1757,9 @@ mark {
   .link-texto:hover {
     color: var(--branco);
   }
+  .servico-card:hover {
+    border-color: rgb(255 255 255 / 0.22);
+  }
   .problemas a:hover strong {
     color: var(--brand-blue-claro);
   }
@@ -1763,7 +1791,8 @@ mark {
     transform: translateX(40%);
   }
   .diagnostico-ponto.is-active .diagnostico-ponto-numero::after,
-  .is-loading .diagnostico-status::before {
+  .is-loading .diagnostico-status::before,
+  .servico-icone::after {
     animation: none;
   }
   /* "Reduzir movimento" ligado depois do carregamento: revela sem deslizar. */

@@ -60,58 +60,32 @@ function buttons(reduced, track) {
 
 function cards(reduced, track) {
   $$('[data-card]').forEach(card => {
-    const glow = $('[data-card-glow]', card);
     const icon = $('[data-card-icon]', card);
-    let frame = 0;
-    let pointer = null;
 
-    // Posição do brilho: uma leitura de layout por quadro, só enquanto o mouse está em cima.
-    const updateGlow = () => {
-      frame = 0;
-      if (!pointer) return;
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty('--mx', `${pointer.clientX - rect.left}px`);
-      card.style.setProperty('--my', `${pointer.clientY - rect.top}px`);
-    };
-    const onMove = event => {
-      pointer = event;
-      if (!frame) frame = requestAnimationFrame(updateGlow);
-    };
-
+    // Sem brilho seguindo o cursor: na superfície clara ele não cabe, e era o único motivo para
+    // ler a posição do ponteiro a cada quadro. Sobra o levantar do card e o giro do ícone.
     const lift = () => {
-      animate(glow, { opacity: 1 }, { duration: 0.35, ease: easeOut });
-      if (!reduced) {
-        animate(card, { y: -6 }, spring);
-        animate(icon, { rotate: -8, scale: 1.08 }, springBouncy);
-      }
+      if (reduced) return;
+      animate(card, { y: -6 }, spring);
+      animate(icon, { rotate: -8, scale: 1.08 }, springBouncy);
     };
     const settle = () => {
-      animate(glow, { opacity: 0 }, { duration: 0.5, ease: easeOut });
-      if (!reduced) {
-        animate(card, { y: 0 }, spring);
-        animate(icon, { rotate: 0, scale: 1 }, spring);
-      }
+      if (reduced) return;
+      animate(card, { y: 0 }, spring);
+      animate(icon, { rotate: 0, scale: 1 }, spring);
     };
 
     track(
-      hover(card, (_el, event) => {
-        onMove(event);
-        card.addEventListener('pointermove', onMove, { passive: true });
+      hover(card, () => {
         lift();
         return () => {
-          card.removeEventListener('pointermove', onMove);
-          pointer = null;
           if (!card.contains(document.activeElement)) settle();
         };
       }),
     );
 
-    // Teclado: o foco dentro do card acende a borda a partir do topo.
-    const onFocusIn = () => {
-      card.style.setProperty('--mx', '50%');
-      card.style.setProperty('--my', '0%');
-      lift();
-    };
+    // Teclado: o foco dentro do card produz o mesmo realce do mouse.
+    const onFocusIn = () => lift();
     const onFocusOut = event => {
       if (!card.contains(event.relatedTarget) && !card.matches(':hover')) settle();
     };
@@ -120,7 +94,6 @@ function cards(reduced, track) {
     track(() => {
       card.removeEventListener('focusin', onFocusIn);
       card.removeEventListener('focusout', onFocusOut);
-      cancelAnimationFrame(frame);
     });
   });
 }
