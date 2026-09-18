@@ -1,5 +1,6 @@
-// Anime.js: desenho técnico do hero e contadores. Os elementos daqui não são tocados por GSAP nem Motion;
-// o GSAP apenas decide *quando* (via callbacks) e esta camada decide *como*.
+// Anime.js: desenho técnico do hero e indicadores das etapas. Os elementos daqui não são
+// tocados por GSAP nem Motion; o GSAP apenas decide *quando* (via callbacks) e esta camada
+// decide *como*.
 import { animate, createDrawable, createTimeline, stagger, utils } from 'animejs';
 
 const silent = { play() {} };
@@ -81,44 +82,6 @@ export function createStepsIndicators(root, { reducedMotion }) {
       if (active && nodes[index]) {
         animate(nodes[index], { scale: [1, 1.14, 1], duration: 700, ease: 'outQuad' });
       }
-    },
-  };
-}
-
-/** Contadores: sobem uma única vez até o valor escrito no HTML. */
-export function createCounters(root, { reducedMotion }) {
-  if (!root) return silent;
-  const numbers = [...root.querySelectorAll('[data-count]')];
-  const bars = root.querySelectorAll('[data-stat-bar]');
-
-  // Reserva a largura final para o número não empurrar o layout enquanto conta.
-  numbers.forEach(el => {
-    el.style.display = 'inline-block';
-    el.style.minWidth = `${el.dataset.count.length}ch`;
-  });
-  if (reducedMotion) return silent;
-
-  numbers.forEach(el => (el.textContent = '0'));
-  utils.set(bars, { scaleX: 0 });
-
-  let played = false;
-  return {
-    play() {
-      if (played) return;
-      played = true;
-      numbers.forEach((el, index) => {
-        const target = Number(el.dataset.count);
-        const state = { value: 0 };
-        animate(state, {
-          value: target,
-          duration: 1600,
-          delay: index * 120,
-          ease: 'outExpo',
-          onUpdate: () => (el.textContent = String(Math.round(state.value))),
-          onComplete: () => (el.textContent = String(target)),
-        });
-      });
-      animate(bars, { scaleX: [0, 1], duration: 900, ease: 'outExpo', delay: stagger(120, { start: 250 }) });
     },
   };
 }

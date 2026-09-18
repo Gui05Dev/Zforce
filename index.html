@@ -9,12 +9,11 @@
   <meta name="theme-color" content="#0a0a0b">
   <meta name="color-scheme" content="dark">
   <link rel="icon" href="assets/zforce-mark.webp">
-  <!-- As três fontes aparecem acima da dobra: a 400 no texto, a 600 no rótulo e no botão
-       do WhatsApp, e a Condensed 700 no <h1>. Sem o preload da 600 o botão principal
-       pisca com a fonte de sistema. -->
+  <!-- As duas faces aparecem acima da dobra: a Condensed 700 no <h1> e a Plex Sans no texto
+       e no botão do WhatsApp. A Plex é variável, então um arquivo cobre do 400 ao 600 e o
+       botão principal não pisca com a fonte de sistema. -->
   <link rel="preload" href="assets/fonts/barlow-condensed-700.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/ibm-plex-sans-var.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Marca o documento antes da pintura: sem JS o conteúdo fica visível; com JS e sem
        "reduzir movimento", o hero começa oculto até a timeline do GSAP assumir.
@@ -26,6 +25,14 @@
   <script>
     (function (d) {
       var c = d.documentElement.classList;
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      // #inicio e #conteudo apontam para o topo do conteúdo, e a abertura fica ACIMA dele.
+      // Clicar na marca do topo grava #inicio no endereço, então sem isto qualquer entrada
+      // seguinte (recarregar, abrir o favorito, colar o link) pularia a introdução. Rodar aqui,
+      // antes do corpo ser lido, evita o salto do navegador em vez de desfazê-lo depois.
+      if (/^#(inicio|conteudo)$/.test(location.hash)) {
+        history.replaceState(null, '', location.pathname + location.search);
+      }
       c.remove('no-js');
       c.add('js');
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -43,6 +50,21 @@
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Abertura: a palavra é um recorte para o campo que está atrás dela. Fica FORA de
+       #smooth-content, como o topo, porque position: fixed não sobrevive ao transform do
+       ScrollSmoother. Sem JS ou com "reduzir movimento" o CSS esconde tudo isso. -->
+  <div class="portal" data-portal aria-hidden="true">
+    <div class="portal-campo" data-portal-campo></div>
+    <svg class="portal-arte" data-portal-arte focusable="false">
+      <defs>
+        <clipPath id="portal-recorte" clipPathUnits="userSpaceOnUse">
+          <text class="portal-glifo" data-portal-glifo x="0" y="0">Z-FORCE</text>
+        </clipPath>
+      </defs>
+    </svg>
+    <p class="portal-poster" data-portal-poster>Z-FORCE</p>
+  </div>
 
   <header class="topo" data-topo>
     <div class="shell topo-linha">
@@ -69,6 +91,7 @@
        sem sofrer transform. -->
   <div id="smooth-wrapper">
   <div id="smooth-content">
+  <div class="portal-espaco" data-portal-espaco aria-hidden="true"></div>
   <main id="conteudo" tabindex="-1">
     <section class="abertura" id="inicio" data-hero>
       <div class="abertura-fundo" aria-hidden="true">
@@ -139,9 +162,6 @@
             </svg>
           </figure>
         </div>
-      </div>
-
-      <div class="shell abertura-base">
       </div>
     </section>
 

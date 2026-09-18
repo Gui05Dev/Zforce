@@ -51,6 +51,11 @@ propriedade do mesmo elemento** — é a origem mais provável de bug visual aqu
 Exemplo do limite: no diagnóstico o GSAP revela os blocos, o Three posiciona os pontos sobre o
 modelo e o Motion anima a troca do card. Nenhum toca no que é do outro.
 
+No hero vale o mesmo: o GSAP só avisa **quando** o hero entra em cena (`onHeroVisible`), e
+`criarPalcoDoHero()` em [js/main.js](js/main.js) decide o resto — o desenho começa aí, fica
+parado `PAUSA_APOS_DESENHO` depois de pronto e só então dá lugar ao patinete 3D, desde que a
+seção ainda esteja visível. Quem passa direto tem a troca adiada até voltar.
+
 Outras regras de scroll:
 - O **ScrollSmoother é criado antes de qualquer ScrollTrigger**. Não é criado com
   `prefers-reduced-motion` nem em aparelhos só de toque (lá a rolagem é nativa).
@@ -59,6 +64,27 @@ Outras regras de scroll:
 
 Feedback de interação (press, hover) é rápido de propósito — 100–200 ms. Só transição de conteúdo
 é lenta. Não uniformize os dois.
+
+## A abertura (símbolo antes do hero)
+
+Antes do hero existe uma abertura: a palavra "Z-FORCE" é um recorte SVG e, ao rolar, a câmera
+entra por dentro do Z até a tela caber no traço — só então o recorte é solto e o hero aparece.
+Módulo em [js/modules/glyphPortal.js](js/modules/glyphPortal.js), que traz o aviso de licença MIT
+do Glyph Portal, de onde vem o algoritmo da maior área cheia de tinta.
+
+O que não é óbvio no código:
+
+- O palco é `position: fixed` e fica **fora de `#smooth-content`**, como o topo. Um espaçador
+  dentro do conteúdo cria a distância de rolagem e empurra o hero para baixo o mesmo tanto, então
+  o hero já está na posição final quando a abertura termina — sem pin, sem sticky, sem salto.
+- **A entrada do hero fica pausada** e quem a dispara é a revelação (`playHero`). A trava de 1,2 s
+  do `index.html` continua valendo: se a abertura não iniciar, o hero é revelado pelo CSS.
+- `#inicio` e `#conteudo` são removidos do endereço no carregamento (script inline do `<head>`):
+  apontam para o topo do conteúdo, e a abertura fica acima dele. Sem isso, clicar na marca grava
+  `#inicio` e toda entrada seguinte pularia a introdução.
+- Com `prefers-reduced-motion` ou sem JavaScript o CSS esconde palco e espaçador.
+
+Duração: `distancia()` no módulo (alturas de tela) e os marcos `REVELA`, `CAMERA_PRONTA` e `SOME`.
 
 ## Progressive enhancement
 
@@ -110,8 +136,9 @@ otimizado (~900 KB) é publicado. Há teste travando essa regressão.
 
 ## Orçamento de performance
 
-O chunk de entrada tem ~96 KB gzip: GSAP 51,7 · Motion 18,4 · Anime 15,1 · código próprio 12,0.
-Ele bloqueia a revelação do hero, então é o número que importa.
+O chunk de entrada tem ~97 KB gzip (GSAP, Motion, Anime e o código próprio, incluindo a
+abertura). Ele bloqueia a revelação do hero, então é o número que importa — confira com
+`npm run build` sempre que mexer no caminho crítico.
 
 - Três bibliotecas de animação no caminho crítico já é muito. Consolidar é melhoria pendente;
   adicionar uma quarta precisa de justificativa forte.
@@ -120,6 +147,8 @@ Ele bloqueia a revelação do hero, então é o número que importa.
   janela estreita tem a mesma GPU e menos pixels. Usar `mobile` aqui tira o 3D de quem só
   restaurou a janela — e faz o resultado depender do tamanho dela no carregamento, já que o
   ambiente é lido uma única vez.
+- Pela mesma razão, **nada que dependa de largura deve ler `env.mobile`**: esse valor é um retrato
+  do boot. Use `gsap.matchMedia()` com a condição, que reverte e refaz sozinho no resize.
 - Mídia pesada no hero (vídeo de fundo, imagem grande) briga direto com o objetivo do site.
 
 ## Testes

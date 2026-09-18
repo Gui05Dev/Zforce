@@ -97,6 +97,12 @@ test('JS no tempo normal: quem revela o hero é o GSAP, sem a trava do CSS', asy
   await page.waitForFunction(animReady, null, { timeout: 20_000 });
 
   await expect(page.locator('html')).not.toHaveClass(/anim-fallback/);
+  // Com o portal tipográfico à frente, a entrada do hero fica pronta e parada: quem a dispara é
+  // a revelação. Antes dela o hero está atrás de um palco opaco, então continuar em opacity 0
+  // não esconde nada de ninguém — o que a trava proíbe é ficar oculto COM a tela livre.
+  await expect(page.locator('[data-portal]')).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  await page.waitForTimeout(1500);
   await expect(page.locator('[data-hero-title]')).toHaveCSS('opacity', '1');
   await expect(page.locator('.abertura-acoes .botao')).toBeVisible();
   expect(problems).toEqual([]);

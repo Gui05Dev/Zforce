@@ -16,10 +16,13 @@ const noop = () => {};
  * @param {{ reducedMotion: boolean, mobile: boolean, lowPower: boolean }} options.env
  * @param {object} options.hooks callbacks para os outros módulos
  */
-export function initScrollAnimations({ env, hooks = {} }) {
-  const { onHeroDrawing = noop, onSectionChange = noop, onStepsProgress = noop, onStepActive = noop } = hooks;
+export function initScrollAnimations({ env, hooks = {}, heroPausado = false }) {
+  const { onSectionChange = noop, onStepsProgress = noop, onStepActive = noop, onHeroVisible = noop } = hooks;
   const animate = !env.reducedMotion;
-  const mobile = env.mobile;
+  // Largura é condição viva, não estado de boot: quem restaura ou estreita a janela precisa
+  // receber os valores certos. Só a entrada do hero lê uma vez, porque roda uma vez só.
+  // 859px: a mesma dobra do css/style.css. Ver o comentário em env.js.
+  const estreito = () => window.matchMedia('(max-width: 859px)').matches || window.matchMedia('(pointer: coarse)').matches;
   // A trava do index.html remove .anim quando este bundle demora mais de 1,2 s: o hero já foi
   // revelado por CSS. Refazer a entrada aqui esconderia tudo de novo — um piscar bem visível.
   const heroPendente = document.documentElement.classList.contains('anim');
@@ -40,6 +43,20 @@ export function initScrollAnimations({ env, hooks = {} }) {
       });
     });
 
+    // Quem decide a hora do desenho técnico e da troca pelo patinete 3D: os dois só acontecem
+    // com o hero realmente em cena, e a troca espera o visitante voltar se ele passar direto.
+    const hero = $('[data-hero]');
+    if (hero) {
+      ScrollTrigger.create({
+        trigger: hero,
+        // 'top bottom': o hero fica abaixo do topo fixo, então 'top top' nunca estaria ativo
+        // no início da página.
+        start: 'top bottom',
+        end: 'bottom 30%',
+        onToggle: self => onHeroVisible(self.isActive),
+      });
+    }
+
     // "Como funciona o atendimento": em telas largas e com movimento permitido, a seção
     // prende na tela (pin) enquanto a pessoa rola — só solta quando o "circuito" (linha +
     // anéis) completa, ou reverte se ela voltar. Em mobile / "reduzir movimento", cai para o
@@ -59,7 +76,11 @@ export function initScrollAnimations({ env, hooks = {} }) {
         });
       };
 
-      if (animate && !mobile && total) {
+      // Largura lida na hora: o gatilho é criado dentro do contexto de estrutura, que não é
+      // refeito no resize. Um ScrollTrigger.refresh() recalcula posições, não troca o modo —
+      // então quem cruza 860px continua no modo em que carregou. Fica registrado como limite
+      // conhecido; trocar o modo em tempo real exigiria recriar o pin, com salto de rolagem.
+      if (animate && !estreito() && total) {
         ScrollTrigger.create({
           trigger: stepsArea,
           // Prende perto do topo, mas não colada nele: sobra uma tira da seção anterior
@@ -109,15 +130,35 @@ export function initScrollAnimations({ env, hooks = {} }) {
   });
 
   let intro = null;
+  // Com o portal tipográfico à frente, a entrada do hero fica pronta mas parada: quem a dispara
+  // é a revelação. Sem portal, `playHero` nunca é chamado e a timeline já nasce rodando.
+  let playHero = () => {};
   const mm = gsap.matchMedia();
 
   if (animate) {
     try {
-      if (heroPendente) intro = gsap.context(() => heroIntro({ onHeroDrawing, mobile }));
-      else onHeroDrawing(); // hero já visível: só o desenho técnico ainda precisa ser disparado
+      if (heroPendente) {
+        intro = gsap.context(() => {
+          const tl = heroIntro({ mobile: estreito(), pausado: heroPausado });
+          if (tl) playHero = () => tl.play();
+        });
+      }
 
-      // Revelações e feixes: revertem sozinhos se o usuário ativar "reduzir movimento" com a página aberta.
-      mm.add('(prefers-reduced-motion: no-preference)', () => scrollReveals({ mobile, lowPower: env.lowPower }));
+      // Revelações e feixes: o matchMedia do GSAP reverte e refaz sozinho quando qualquer
+      // condição muda — seja "reduzir movimento" ligado com a página aberta, seja a janela
+      // atravessando 860px. Sem isso, quem abre estreito e maximiza fica com as distâncias de
+      // celular para sempre, que é a armadilha que o CLAUDE.md descreve para o corte do 3D.
+      mm.add(
+        {
+          semRestricao: '(prefers-reduced-motion: no-preference)',
+          compacto: '(max-width: 859px), (pointer: coarse)',
+        },
+        contexto => {
+          const { semRestricao, compacto } = contexto.conditions;
+          if (!semRestricao) return;
+          scrollReveals({ mobile: compacto, lowPower: env.lowPower });
+        },
+      );
 
       // Parallax: feito pelo ScrollSmoother (data-speed / data-lag em elementos decorativos).
     } catch (error) {
@@ -127,9 +168,6 @@ export function initScrollAnimations({ env, hooks = {} }) {
       structure.revert();
       throw error;
     }
-  } else {
-    // Sem movimento a timeline não roda, então o desenho aparece completo de imediato.
-    onHeroDrawing();
   }
 
   // Medidas mudam quando fontes e imagens terminam de carregar.
@@ -140,6 +178,7 @@ export function initScrollAnimations({ env, hooks = {} }) {
 
   return {
     refresh,
+    playHero: () => playHero(),
     destroy() {
       window.removeEventListener('load', refresh);
       mm.revert();
@@ -149,19 +188,19 @@ export function initScrollAnimations({ env, hooks = {} }) {
   };
 }
 
-function heroIntro({ onHeroDrawing, mobile }) {
+function heroIntro({ mobile, pausado = false }) {
   const hero = $('[data-hero]');
-  if (!hero) return;
+  if (!hero) return null;
   const title = $('[data-hero-title]', hero);
   // Por nome, não por posição: remover um item do hero não pode deslocar a entrada dos outros.
   const lead = $('[data-hero-item="lead"]', hero);
   const actions = $('[data-hero-item="acoes"]', hero);
   const figure = $('[data-hero-figure]', hero);
-  const strip = $('[data-hero-strip]', hero);
   const beams = $('[data-hero-beams]', hero);
 
   const split = title ? SplitText.create(title, { type: 'lines', mask: 'lines' }) : null;
   const tl = gsap.timeline({
+    paused: pausado,
     defaults: { ease: 'expo.out', duration: 1.1 },
     // Depois da entrada, o título volta ao DOM original e reflui livremente no resize.
     onComplete: () => split?.revert(),
@@ -184,12 +223,8 @@ function heroIntro({ onHeroDrawing, mobile }) {
     ease: 'power3.inOut',
     clearProps: 'clipPath',
   });
-  tl.call(onHeroDrawing, null, mobile ? 0.35 : 0.15);
   enter(beams, {}, 0.3, { duration: 1.4, ease: 'power2.out' });
-  // children pode estar vazio se a faixa perder os itens: o GSAP avisaria no console.
-  if (strip?.children.length) {
-    tl.set(strip, { opacity: 1 }, 0.4).from(strip.children, { opacity: 0, y: 14, stagger: 0.07, duration: 0.7 }, 0.4);
-  }
+  return tl;
 }
 
 function scrollReveals({ mobile, lowPower }) {

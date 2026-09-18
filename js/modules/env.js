@@ -57,6 +57,8 @@ export function readEnvironment() {
   const mq = query => window.matchMedia(query).matches;
   const connection = navigator.connection || {};
   const reducedMotion = mq('(prefers-reduced-motion: reduce)');
+  // 859px é a mesma dobra usada no css/style.css (@media max-width: 859px / min-width: 860px).
+  // Mudar aqui exige mudar lá — não há nada que sincronize os dois automaticamente.
   const mobile = mq('(max-width: 859px)') || mq('(pointer: coarse)');
   const lowPower = isLowPower({
     saveData: connection.saveData,

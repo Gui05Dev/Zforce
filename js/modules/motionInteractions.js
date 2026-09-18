@@ -19,7 +19,6 @@ export function initInteractions({ env }) {
   cards(reduced, track);
   const menu = mobileMenu(reduced, track);
   const indicator = navIndicator(reduced, track);
-  entradaEmSequencia('[data-diferenciais]', '[data-diferencial]', reduced, track);
   rodape(reduced, track, env.lowPower);
 
   return {

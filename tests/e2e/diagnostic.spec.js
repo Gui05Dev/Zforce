@@ -110,6 +110,10 @@ test('selecionar pelo ponto atualiza estado, card e botão do WhatsApp com compo
 
   const cta = rodas.locator('[data-diagnostic-cta]');
   await expect(cta).toHaveText(/Estou com este problema/);
+  // O card só aceita clique quando a troca termina e o `inert` sai. Um clique antes disso o
+  // navegador engole em silêncio — sem erro e sem efeito —, e era a origem da instabilidade
+  // desta prova quando a suíte roda em paralelo e as animações atrasam.
+  await expect.poll(() => rodas.getAttribute('inert'), { timeout: 10_000 }).toBeNull();
   await rodas.locator('[data-symptom="Freio fraco."]').click();
   await expect(rodas.locator('[data-symptom="Freio fraco."]')).toHaveAttribute('aria-pressed', 'true');
   const href = await cta.getAttribute('href');

@@ -76,9 +76,51 @@ export function initSmoothScroll({ env }) {
     const target = initialHash && document.getElementById(initialHash);
     if (target) scrollTo(target, { smooth: false });
   };
+
+  // A página continua crescendo depois do load: o espaçador do portal ganha altura, o
+  // diagnóstico monta a seção, as fontes trocam. Um salto único deixa a âncora parada onde o
+  // alvo estava, não onde ele ficou. Então a posição é reaplicada a cada refresh do
+  // ScrollTrigger — e para no instante em que o visitante rola por conta própria.
+  let visitanteRolou = false;
+  let ultimaPosicao = null;
+  let reancorando = false;
+  const marcarRolagem = () => (visitanteRolou = true);
+  const reancorar = () => {
+    // scrollTo pede um refresh ao ScrollTrigger, que chama este ouvinte de novo: sem a trava
+    // de reentrada a pilha estoura antes da página terminar de carregar.
+    if (visitanteRolou || reancorando) return;
+    const alvo = initialHash && document.getElementById(initialHash);
+    if (!alvo) return;
+    // A trava cobre a função inteira: tanto offset quanto scrollTo pedem refresh ao
+    // ScrollTrigger, e cada refresh chama este ouvinte de volta.
+    reancorando = true;
+    try {
+      const posicao = Math.round(smoother.offset(alvo, `top ${headerOffset()}px`));
+      // Quando o layout para de crescer a posição repete e o reancoramento se encerra sozinho.
+      if (posicao === ultimaPosicao) return;
+      ultimaPosicao = posicao;
+      smoother.scrollTo(posicao, false);
+    } finally {
+      reancorando = false;
+    }
+  };
+  const pararDeReancorar = () => {
+    ScrollTrigger.removeEventListener('refresh', reancorar);
+    window.removeEventListener('wheel', marcarRolagem);
+    window.removeEventListener('touchstart', marcarRolagem);
+    window.removeEventListener('keydown', marcarRolagem);
+    window.removeEventListener('load', jumpToHash);
+  };
+  let fimDoReancoramento = 0;
   if (initialHash) {
     if (document.readyState === 'complete') requestAnimationFrame(jumpToHash);
     else window.addEventListener('load', jumpToHash, { once: true });
+    window.addEventListener('wheel', marcarRolagem, { passive: true, once: true });
+    window.addEventListener('touchstart', marcarRolagem, { passive: true, once: true });
+    window.addEventListener('keydown', marcarRolagem, { once: true });
+    ScrollTrigger.addEventListener('refresh', reancorar);
+    // Teto curto: passado isso a página já assentou, e insistir seria brigar com o visitante.
+    fimDoReancoramento = window.setTimeout(pararDeReancorar, 4000);
   }
 
   return {
@@ -86,7 +128,8 @@ export function initSmoothScroll({ env }) {
     scrollTo,
     destroy() {
       document.removeEventListener('click', onClick);
-      window.removeEventListener('load', jumpToHash);
+      clearTimeout(fimDoReancoramento);
+      pararDeReancorar();
       smoother.kill();
       root.classList.remove('has-smoother');
     },

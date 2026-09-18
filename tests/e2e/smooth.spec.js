@@ -48,7 +48,9 @@ test.describe('desktop com ScrollSmoother', () => {
     const back = await page.locator('.rodape-topo').boundingBox();
     await page.mouse.click(back.x + back.width / 2, back.y + back.height / 2);
     await page.waitForTimeout(SETTLE + 600);
-    expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(2);
+    // "Voltar ao início" leva ao hero, não ao topo absoluto: acima dele fica a introdução
+    // tipográfica, e refazer a entrada a cada clique seria hostil.
+    expect(Math.abs((await topOf(page, '#inicio')) - (await headerHeight(page)))).toBeLessThanOrEqual(4);
   });
 
   test('abrir com /#contato já posiciona a seção abaixo do topo', async ({ page }) => {

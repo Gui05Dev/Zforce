@@ -192,12 +192,12 @@ própria. Para mudar uma mensagem, gere o texto com
 `encodeURIComponent("sua mensagem")` no console do navegador e troque o valor
 depois de `text=`.
 
-## Diferenciais da seção "Sobre"
-No lugar dos antigos contadores (3 tipos de veículo, 8 problemas, 4 etapas, 100%) estão quatro
-diferenciais com ícone, título e descrição, editáveis direto no `index.html`. A troca foi
-proposital: aqueles números descreviam o próprio site, não o atendimento, e passavam por
-estatística sem ser. **Não invente número de clientes, de reparos ou de anos de experiência** —
-sem dado verificável, um diferencial qualitativo vale mais.
+## Nada de estatística inventada
+O site já teve contadores (3 tipos de veículo, 8 problemas, 4 etapas, 100%) e depois quatro
+diferenciais com ícone; os dois blocos foram removidos. Os números descreviam o próprio site, não
+o atendimento, e passavam por estatística sem ser. **Não invente número de clientes, de reparos
+ou de anos de experiência** — sem dado verificável, uma afirmação qualitativa vale mais. Há teste
+travando isso (`nenhuma estatística inventada em toda a página`).
 
 ## O que falta (conteúdo real)
 - **Fotos reais** da oficina, da equipe e de reparos (antes/depois). A seção "Resultados"
